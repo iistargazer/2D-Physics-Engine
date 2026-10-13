@@ -1,0 +1,6 @@
+Collecting cmake
+  Downloading cmake-4.4.4-py3-none-win_amd64.whl.metadata (7.0 kB)
+Downloading cmake-4.4.4-py3-none-win_amd64.whl (42.3 MB)
+   ---------------------------------------- 42.3/42.3 MB 12.6 MB/s  0:00:03
+Installing collected packages: cmake
+Successfully installed cmake-4.4.4

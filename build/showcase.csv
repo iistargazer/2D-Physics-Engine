@@ -1,0 +1,11 @@
+scene,name,bodies,frames,mean_ms,total_ms,max_joint_error,ccd_events,ccd_capped,ccd_clamped,awake_end
+0,Newton's cradle,6,240,0.004888,1.173,0.000000,0,0,0,5
+1,Domino run,46,240,0.082018,19.684,0.000000,0,0,0,45
+2,Wrecking pyramid,213,240,2.527189,606.525,0.000000,0,0,0,211
+3,Ragdoll,7,240,0.018766,4.504,0.034975,0,0,0,6
+4,Suspension bridge,102,240,0.789273,189.425,0.010674,0,0,0,100
+5,Motorized car,7,240,0.009571,2.297,0.000000,0,0,0,3
+6,Rube-Goldberg machine,14,240,0.058080,13.939,0.000000,0,0,0,11
+7,Stress: 5000 boxes,5001,600,13.689410,8213.646,0.000000,0,0,0,0
+8,Bullet vs wall (CCD),2,240,0.003877,0.931,0.000000,1,0,0,1
+9,Momentum row (cradle test),5,240,0.001796,0.431,0.000000,0,0,0,5

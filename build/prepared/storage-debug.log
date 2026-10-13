@@ -1,0 +1,2 @@
+PASS: prepared first/repeated active-contact + joint steps, tree/all-pairs, sleep/wake, cache reset, shrink, CCD and all five capacity failures allocate zero; prepared trajectories equal dynamic reference
+LAYOUT Capacity 40/8 CachedManifold 272/8 Snapshot 96/8 ContactPoint 104/8 ContactManifold 288/8 TreeNode 64/8

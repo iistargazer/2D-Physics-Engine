@@ -1,0 +1,7 @@
+shape,speed,mean_step_ms,max_events,capped_trials
+circle,200,0.019826,1,0
+circle,1000,0.004259,1,0
+circle,10000,0.004834,1,0
+polygon,200,0.008587,1,0
+polygon,1000,0.016565,1,0
+polygon,10000,0.005267,1,0

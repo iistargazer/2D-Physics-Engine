@@ -1,0 +1,96 @@
+[mass properties]
+  ok:   box I = m(w^2+h^2)/12 = 1.2500
+  ok:   polygon I matches box (1.2500), CW input + offset handled
+  ok:   vertices re-centred on centroid
+  ok:   circle I = m r^2 / 2 = 0.2500
+[symplectic Euler: harmonic oscillator energy]
+  ok:   no secular drift over 1000 s: late max 52.6316 vs early max 52.6316 (E0=50.0)
+  ok:   bounded oscillation ~ omega*dt: 10.0% of E0
+  ok:   explicit Euler blows up in 20 s: E/E0 = 439286205 (shown for contrast)
+[box dropped on ground]
+  ok:   rests at y = 0.4972 (expected ~0.49-0.5)
+  ok:   settles flat, angle mod 90deg = -0.0008
+  ok:   at rest (|v|=0.0000, w=-0.0000)
+[circle restitution]
+  ok:   first rebound height = 3.27 (ideal 3.2)
+[Coulomb friction on a 0.35 rad slope: tan(0.35)=0.365]
+  ok:   mu=0.60 > tan(theta): holds, slid 0.001 m
+  ok:   mu=0.05 < tan(theta): slides, 13.14 m in 3 s
+[3-box stack]
+  ok:   top box y = 2.492 (ideal 2.5)
+  ok:   no lateral drift: x = 0.0000
+  ok:   stack at rest: |v| = 0.0000
+[AABB geometry]
+  ok:   touching bounds overlap conservatively
+  ok:   separated bounds reject
+  ok:   fat containment and perimeter
+  ok:   circle bounds
+  ok:   rotated polygon bounds
+[dynamic tree: sorted insertion, movement, removal, reuse]
+  ok:   sorted insertion stays balanced, height=10
+  ok:   small motion retains fat proxy
+  ok:   teleport reinserts proxy
+  ok:   query finds teleported leaf only
+  ok:   removal through empty tree preserves invariants
+  ok:   free-list reuse has no stale leaf
+[broadphase: fixed-seed oracle and public body mutations]
+  ok:   identical narrowphase contact-pair sets over 50 randomized frames
+  ok:   candidate pairs exactly equal tight-AABB oracle, sorted and unique
+  ok:   tree invariants survive rotation, teleport, grow, erase, reorder, replacement
+  ok:   empty world resets proxies
+  ok:   static/static pairs omitted
+[world: deterministic tree vs all-pairs trajectories]
+  ok:   bit-identical trajectories over 600 fixed steps
+  ok:   all simulated states remain finite
+[persistent feature IDs and warm impulses]
+  ok:   clipped contact IDs are distinct and stable under tangential motion
+  ok:   cached normal and tangent impulses actually seed body velocity
+  ok:   cold-start option clears accumulated impulses
+  ok:   teleport invalidates old support impulses
+[warm-start 20-box stack and 15-row pyramid: 20 seconds]
+  ok:   20-box stack stable: speed=0.00000 drift=0.00000 tilt=0.00000 depth=0.01000
+  ok:   stack retains height: top=19.3878 ideal=19.5
+  ok:   15-row pyramid stable: speed=0.00000 drift=0.00244 tilt=0.00134 depth=0.01000
+  ok:   pyramid retains height: top=14.3791 ideal=14.5
+[joint constraints]
+  ok:   distance frequency=0.0 reaches rest length: 1.00000000
+  ok:   distance frequency=3.0 reaches rest length: 1.00000000
+  ok:   small-angle pendulum period=2.8333 s
+  ok:   10-link revolute chain anchor error=0.000035
+  ok:   motor reaches prescribed speed
+  ok:   motor respects angular limit: angle=0.300000
+  ok:   mouse spring converges to target
+  ok:   prismatic constrains intended degrees of freedom
+  ok:   weld constrains intended degrees of freedom
+[NGS and sleeping islands]
+  ok:   NGS reduces overlap without adding kinetic velocity: y=0.477785
+  ok:   contact-connected stack sleeps as one island
+  ok:   external force wakes the entire connected island
+  ok:   static floor does not merge independent islands
+  ok:   nonpositive dt rejected
+[continuous shape casts and thin bullets]
+  ok:   circle bullet 200 m/s cannot cross 0.02m wall: x=-0.050000 events=1
+  ok:   circle bullet 1000 m/s cannot cross 0.02m wall: x=-0.050000 events=1
+  ok:   circle bullet 10000 m/s cannot cross 0.02m wall: x=-0.050000 events=1
+  ok:   thin polygon bullet 200 m/s cannot cross 0.02m wall: x=-0.050799 events=1
+  ok:   rotating touching polygon explicitly reports conservative freeze
+  ok:   thin polygon bullet 1000 m/s cannot cross 0.02m wall: x=-0.050799 events=1
+  ok:   rotating touching polygon explicitly reports conservative freeze
+  ok:   thin polygon bullet 10000 m/s cannot cross 0.02m wall: x=-0.050799 events=1
+  ok:   rotating touching polygon explicitly reports conservative freeze
+  ok:   moving/moving circle TOI matches analytic root: 0.14999999
+  ok:   separated sweep is not a false impact
+[smooth-force policy convergence]
+  ok:   symplectic first-order convergence ratio 2.0403
+  ok:   Verlet second-order convergence ratio 4.0031
+  ok:   RK4 fourth-order convergence ratio 16.1013
+[fixed-seed randomized no-gravity elastic fuzz]
+  ok:   fuzz has no nonfinite state over 2000 steps
+  ok:   fixed seed produces bit-identical repeated trajectories
+  ok:   fuzz has no energy blow-up: max/initial=1.00000000
+[showcase smoke and projected bridge]
+  ok:   all nine showcase scene factories produce finite states
+  ok:   100-plank bridge projection max anchor error=0.010387
+  ok:   phase timing instrumentation produces nonnegative measurements
+
+ALL TESTS PASSED (0 failed)

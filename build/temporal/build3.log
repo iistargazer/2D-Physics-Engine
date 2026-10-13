@@ -1,0 +1,41 @@
+-- Configuring done (0.7s)
+-- Generating done (1.2s)
+-- Build files have been written to: C:/Users/rohan/Downloads/2D Physics Engine/build/temporal/cmake
+[  3%] Building CXX object CMakeFiles/test_engine.dir/test_engine.cpp.obj
+[  6%] Building CXX object CMakeFiles/test_ccd_allocations.dir/test_ccd_allocations.cpp.obj
+[ 10%] Building CXX object CMakeFiles/test_world_storage.dir/test_world_storage.cpp.obj
+[ 13%] Building CXX object CMakeFiles/test_temporal.dir/test_temporal.cpp.obj
+[ 16%] Linking CXX executable test_ccd_allocations.exe
+[ 20%] Built target test_ccd_allocations
+[ 23%] Building CXX object CMakeFiles/test_rows.dir/test_rows.cpp.obj
+[ 26%] Linking CXX executable test_temporal.exe
+[ 30%] Linking CXX executable test_world_storage.exe
+[ 33%] Built target test_temporal
+[ 36%] Built target test_world_storage
+[ 40%] Building CXX object CMakeFiles/test_rows.dir/test_allocation_counter.cpp.obj
+[ 43%] Building CXX object CMakeFiles/benchmark_broadphase.dir/benchmark_broadphase.cpp.obj
+[ 46%] Building CXX object CMakeFiles/demo_broadphase.dir/demo_broadphase.cpp.obj
+[ 50%] Linking CXX executable test_engine.exe
+[ 53%] Linking CXX executable test_rows.exe
+[ 53%] Built target test_engine
+[ 56%] Building CXX object CMakeFiles/benchmark_stability.dir/benchmark_stability.cpp.obj
+[ 56%] Built target test_rows
+[ 60%] Building CXX object CMakeFiles/benchmark_joints.dir/benchmark_joints.cpp.obj
+[ 63%] Linking CXX executable benchmark_broadphase.exe
+[ 63%] Built target benchmark_broadphase
+[ 66%] Linking CXX executable demo_broadphase.exe
+[ 70%] Building CXX object CMakeFiles/benchmark_ccd.dir/benchmark_ccd.cpp.obj
+[ 70%] Built target demo_broadphase
+[ 76%] Built target study_integrators
+[ 80%] Building CXX object CMakeFiles/benchmark_showcase.dir/benchmark_showcase.cpp.obj
+[ 83%] Linking CXX executable benchmark_stability.exe
+[ 86%] Linking CXX executable benchmark_joints.exe
+[ 86%] Built target benchmark_stability
+[ 90%] Building CXX object CMakeFiles/benchmark_sleeping.dir/benchmark_sleeping.cpp.obj
+[ 90%] Built target benchmark_joints
+[ 93%] Linking CXX executable benchmark_ccd.exe
+[ 93%] Built target benchmark_ccd
+[ 96%] Linking CXX executable benchmark_showcase.exe
+[ 96%] Built target benchmark_showcase
+[100%] Linking CXX executable benchmark_sleeping.exe
+[100%] Built target benchmark_sleeping

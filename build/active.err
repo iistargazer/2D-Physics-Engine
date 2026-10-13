@@ -1,0 +1,17 @@
+
+case                         p50 median       p50 [min..max]   dominant         ms
+stress5k_awake_settled           40.164 [   40.095..   41.406]   book         23.752
+stress5k_awake_no_ngs            18.588 [   17.328..   22.529]   broad         9.505
+stress5k_sleeping                13.677 [    9.481..   13.887]   broad         8.374
+stress5k_stirred_awake           86.802 [   86.064..   89.663]   book         55.689
+showcase00_stirred                0.006 [    0.006..    0.006]   solve         0.004
+showcase01_stirred                0.138 [    0.129..    0.144]   solve         0.099
+showcase02_stirred                6.641 [    6.638..    6.770]   book          4.006
+showcase03_stirred                0.057 [    0.055..    0.061]   book          0.046
+showcase04_stirred                2.120 [    1.991..    2.159]   book          1.650
+showcase05_stirred                0.028 [    0.023..    0.028]   book          0.021
+showcase06_stirred                0.179 [    0.173..    0.190]   book          0.156
+showcase09_stirred                0.002 [    0.002..    0.003]   broad         0.001
+ccd_stream_8_bullets              0.050 [    0.050..    0.050]   ccd           0.051
+host-load variance: the fixed 20M-FMA calibration moved +69.9% (56.4 -> 95.9 ms) across the run; every figure is single-host wall clock measured while other work shared the machine.
+EXIT=0

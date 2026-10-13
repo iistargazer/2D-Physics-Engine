@@ -1,0 +1,15 @@
+Test project C:/Users/rohan/Downloads/2D Physics Engine/build/temporal/cmake
+    Start 1: engine
+1/5 Test #1: engine ...........................   Passed   21.03 sec
+    Start 2: ccd_allocations
+2/5 Test #2: ccd_allocations ..................   Passed    0.04 sec
+    Start 3: world_storage
+3/5 Test #3: world_storage ....................   Passed    0.56 sec
+    Start 4: temporal
+4/5 Test #4: temporal .........................   Passed    4.39 sec
+    Start 5: rows
+5/5 Test #5: rows .............................   Passed    0.15 sec
+
+100% tests passed out of 5
+
+Total Test time (real) =  26.19 sec

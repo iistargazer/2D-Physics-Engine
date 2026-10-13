@@ -1,0 +1,60 @@
+# Browser stress-scene driving receipt
+
+Date/context: active-interaction measurement pass. Build: `build/web/index.html` +
+`index.js` + `index.wasm` rebuilt by `bash web/build.sh` from the final headers
+(Emscripten 6.0.12, `-O2 -Wall -Wextra -Wpedantic`).
+
+Page: http://127.0.0.1:8777/index.html, served with
+`python -m http.server 8777 --bind 127.0.0.1` from `build/web`.
+Browser: Chromium via the thread preview tab (`register_preview`).
+
+## Why the driver pauses first
+
+The preview tab reports `document.visibilityState === "hidden"`, so
+`requestAnimationFrame` is throttled and `tick()` advances in catch-up bursts
+(elapsed clamped to 0.25 s). A frozen read-out was observed before this was
+diagnosed: five samples 500 ms apart all read `awake=5000 stepMs=62.15`.
+
+`tick()` skips `g_accumulator += elapsed` while `g_paused` is true, and
+`step_once` forces `g_accumulator = 1/60`, so `_toggle_pause()` + `_step_once()` +
+`_tick_js()` performs **exactly one** `World::step(1/60)` per call. Every row below
+was produced that way, so the reported EMA is a per-step cost, not a catch-up
+artifact.
+
+## Observations (frame buffer `[2]` step EMA, `[4]` awake, `[0]` bodies, `[1]` contacts)
+
+| step | action | bodies | awake | contact points | step EMA |
+|---|---|---|---|---:|---:|
+| fresh `_select_scene(7)` | reset, 10 steps | 5001 | 5000 | 2000 | 14.14 ms |
+| after 20 steps | - | 5001 | 5000 | 8000 | 25.53 ms |
+| after 30 steps | - | 5001 | 5000 | 10000 | 33.37 ms |
+| 270 steps | settled and asleep | 5001 | 0 | 1000 | 13.30 ms |
+| +80 steps, `_spawn_box` every 4 steps | 20 boxes spawned | 5021 | 5020 | 10020 | 44.65 ms |
+| real `+ Box` toolbar click + real canvas click, 1 step | 1 box spawned | 5022 | 5021 | - | 44.30 ms |
+
+DOM read-outs after the driven state agreed with the frame buffer:
+`AWAKE 5,020`, `BODIES 5,021`, `CONTACT POINTS 10020`, `PHYSICS STEP · EMA 44.65 ms`,
+`runtimeStatus PAUSED`. After the real toolbar/canvas clicks: `BODIES 5,022`,
+`aria-pressed=true` on `#spawnBox`, tool hint `Click to place a box...`.
+
+Each step never ran with fewer than one step, so the observed path is:
+sleeping field (0 awake, 13.3 ms) -> continuous input -> 5,020 awake, 44.7 ms.
+
+## Console and page errors
+
+`preview_logs` (console and network) returned empty lists after driving; no errors
+were captured. The 221-assertion Chromium suite separately asserts
+`no browser runtime errors: []` on this same build:
+`build/browser-check/polish-results.log`, `build/browser-check/framing-results.log`
+(221 + 50 assertions, both exit 0).
+
+## What this does NOT demonstrate
+
+- It is the WebAssembly build, not the native one; the numbers are not
+  interchangeable with `build/active.csv`.
+- The reported cost excludes rendering by design (the page says so); no
+  rendered-FPS measurement exists.
+- The tab was hidden and the loop was driven manually, so this is not a
+  frame-cost or animation-cadence measurement.
+- The field is 300 m wide, so "continuous input" wakes one densely connected pile
+  rather than demonstrating sustained input on any other scene.

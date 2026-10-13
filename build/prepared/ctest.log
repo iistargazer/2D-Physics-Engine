@@ -1,0 +1,11 @@
+Test project C:/Users/rohan/Downloads/2D Physics Engine/build/prepared/cmake
+    Start 1: engine
+1/3 Test #1: engine ...........................   Passed   19.06 sec
+    Start 2: ccd_allocations
+2/3 Test #2: ccd_allocations ..................   Passed    0.05 sec
+    Start 3: world_storage
+3/3 Test #3: world_storage ....................   Passed    0.43 sec
+
+100% tests passed out of 3
+
+Total Test time (real) =  19.57 sec

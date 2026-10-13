@@ -1,0 +1,28 @@
+[  5%] Building CXX object CMakeFiles/test_engine.dir/test_engine.cpp.obj
+[ 10%] Building CXX object CMakeFiles/test_ccd_allocations.dir/test_ccd_allocations.cpp.obj
+[ 15%] Building CXX object CMakeFiles/test_ccd_allocations.dir/test_allocation_counter.cpp.obj
+[ 21%] Linking CXX executable test_ccd_allocations.exe
+[ 21%] Built target test_ccd_allocations
+[ 26%] Building CXX object CMakeFiles/benchmark_broadphase.dir/benchmark_broadphase.cpp.obj
+[ 31%] Linking CXX executable benchmark_broadphase.exe
+[ 31%] Built target benchmark_broadphase
+[ 36%] Building CXX object CMakeFiles/demo_broadphase.dir/demo_broadphase.cpp.obj
+[ 42%] Linking CXX executable test_engine.exe
+[ 42%] Built target test_engine
+[ 47%] Building CXX object CMakeFiles/benchmark_stability.dir/benchmark_stability.cpp.obj
+[ 52%] Linking CXX executable demo_broadphase.exe
+[ 57%] Linking CXX executable benchmark_stability.exe
+[ 57%] Built target demo_broadphase
+[ 57%] Built target benchmark_stability
+[ 63%] Building CXX object CMakeFiles/benchmark_joints.dir/benchmark_joints.cpp.obj
+[ 68%] Building CXX object CMakeFiles/benchmark_ccd.dir/benchmark_ccd.cpp.obj
+[ 73%] Linking CXX executable benchmark_joints.exe
+[ 78%] Linking CXX executable benchmark_ccd.exe
+[ 78%] Built target benchmark_joints
+[ 78%] Built target benchmark_ccd
+[ 84%] Building CXX object CMakeFiles/study_integrators.dir/study_integrators.cpp.obj
+[ 89%] Building CXX object CMakeFiles/benchmark_showcase.dir/benchmark_showcase.cpp.obj
+[ 94%] Linking CXX executable study_integrators.exe
+[ 94%] Built target study_integrators
+[100%] Linking CXX executable benchmark_showcase.exe
+[100%] Built target benchmark_showcase

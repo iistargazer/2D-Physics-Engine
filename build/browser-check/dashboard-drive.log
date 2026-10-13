@@ -1,0 +1,114 @@
+# Dashboard drive receipt — presentation pass
+
+Context: the frontend/dashboard pass. Build: `build/web/` rebuilt by `bash web/build.sh`
+from the current headers (Emscripten 6.0.12, `-O2 -Wall -Wextra -Wpedantic`; `web/main.cpp`
+also compiles clean under `-Werror`). Sources: [web/](../../web) — `shell.html`,
+`showcase.css`, `core.js`, `scenes.js`, `render.js`, `instrument.js`, `showcase.js`,
+`main.cpp`. The engine headers, the scene factories and the default PGS path are untouched.
+
+Page: `http://127.0.0.1:8777/index.html`, served with
+`python -m http.server 8777 --bind 127.0.0.1` from `build/web`.
+
+## Method
+
+Every driven number below came from the engine's own pause + single-step path:
+
+    Module._toggle_pause()  -> pause
+    Module._step_once(); Module._tick_js()   -> exactly one World::step(1/60)
+
+The suite asserts `#stepCount` equals the number of driver iterations (it checks 5 after
+five calls and 30 after thirty), so a throttled `requestAnimationFrame` cannot inflate the
+figures. `#stepCount` reads `g_steps`, incremented once per `World::step` in `tick()`.
+
+The preview tab also reported `visibilityState = "visible"` while its webview was not being
+composited, so `requestAnimationFrame` was starved and the frame buffer went stale between
+driver calls. That is why one control change needs a rendered frame (or an explicit
+`_tick_js()`) before the counts in the panel reflect it; the suite waits on the frame buffer
+rather than on the engine flag for exactly this reason. Nothing here is derived from the
+stale path.
+
+## Live observations (thread preview, real clicks)
+
+Driven through the actual UI surface, not through `page.evaluate` shortcuts:
+
+| action | observed |
+|---|---|
+| scene nav click `Stress 5000` | title, category, body count and `#sceneTitle` switch; `#iterations` reseeds to 10, `#ngs` presses on, `#sleeping` presses on — i.e. the panel mirrors the stress factory rather than keeping the cradle's 40 / NGS-off |
+| scene-change wipe | `getComputedStyle(#stageWipe).animationName === "wipe"` at the moment of the switch |
+| `Sleeping` toggle click | `Module._sleeping_enabled()` 0 and `#sleeping[aria-pressed=false]`; the settled field goes 0 → 5,000 awake |
+| `Stage profile` click | `#phaseSource` `PROFILE OFF` → `PROFILE ON`, panel undims, all seven rows populate |
+| canvas click with `+ Box` armed | bodies 5,001 → 5,002 through the pointer handler; `#toolHint` read `Click to place a box…` and `#spawnBox[aria-pressed=true]` |
+| `preview_logs` (console + network) | empty after driving; the previous `/favicon.ico` 404 is gone because the icon is now an inline SVG data URI |
+
+Observed dashboard read-out while the stress field was awake with sleeping disabled:
+`BODIES 5,001`, `AWAKE 5,000`, `ASLEEP 0`, `STATIC 1`, `CONTACT POINTS 10,000`,
+`PHYSICS STEP · EMA 13.12 ms`, `WITHIN BUDGET` at 39.4% of a two-budget bar,
+`Σ 13.00 ms / 13.12 ms`, and stage shares
+`bookkeeping 44.2% (5.75 ms)`, `broadphase 28.2% (3.67 ms)`, `solve 20.5% (2.66 ms)`,
+`narrowphase 6.4% (0.83 ms)`, `integrate 0.7% (0.09 ms)`, `islands 0 µs`, `ccd 0.00 ms`.
+`islands` is exactly zero because island sleeping was off — an independent cross-check that
+the bucket labels mean what they say.
+
+## Measurements (dashboard suite and calibration probes)
+
+| configuration | bodies | awake | contacts | step EMA | stage detail |
+|---|---:|---:|---:|---:|---|
+| stress, sleeping off | 5001 | 5000 | 10000 | 13.1–17.9 ms | bookkeeping 5.75 ms (44%), broadphase 3.67 ms, solve 2.66 ms |
+| stress, iterations 10 → 120 | 5001 | 5000 | 10000 | 43.1–47.3 ms | solve 2.84 → 31.00 ms; over budget, `#statePill` gains `strain` |
+| stress, NGS off (iterations 120) | 5001 | 5000 | 10000 | 35.7 ms | bookkeeping 6.57 → 0.43 ms |
+| stress, settled and sleeping | 5001 | 0 | 1000 | 6.4–8.0 ms | gauge falls back to 20.7% |
+| wrecking pyramid, defaults | 213 | 211 | 970 | 7.10 ms | Σ 7.07 ms: solve 2.96, bookkeeping 3.50, broadphase 0.31 |
+| momentum row, gravity slider set to +9.81 | 5 | 5 | 0 | — | max height 1.27 m after 30 steps |
+
+Stage reconciliation held on both loaded cases: Σ 13.00 ms vs 13.12 ms and Σ 14.19 ms vs
+14.35 ms, i.e. ~99% accounted. The residual is unmeasured time between clock reads.
+
+### Host load moved every figure by more than 2x
+
+The suite was then re-run with the machine loaded. Same build, same scene, same driver:
+
+| case | quiet run | loaded run |
+|---|---:|---:|
+| stress, sleeping off, 5000 awake | 13.1–17.9 ms | 26–28 ms |
+| stress, iterations 120 | 43.1–47.3 ms | 112.5 ms |
+| settle stage: solve, iterations 10 | 2.84 ms | 7.74 ms |
+| settle stage: solve, iterations 120 | 31.00 ms | 83.15 ms |
+| settled, sleeping on | 6.9 ms | 13.7 ms |
+
+That is why the suite's assertions are relational — sleeping cheaper than awake, the gauge
+equal to the step it was given, the stage sum reconciling with the step, the solve stage
+growing with the iteration count — and not millisecond thresholds. An earlier draft asserted
+`settled gauge < 40%` and failed at 41.1% on the loaded run; it was replaced, not loosened.
+
+## What this does and does not show
+
+- It is the **WebAssembly** build. These numbers are not interchangeable with
+  `build/active.csv`, which is native, and neither set is a rendered frame rate — the step
+  cost excludes the canvas paint by construction.
+- The tuning controls are proven to write through to the solver (iterations, NGS, sleeping,
+  gravity each verified by reading the engine back), and two of them are proven to change the
+  measured stage split. That is evidence the panel is wired to the engine, not evidence that
+  any particular setting is a good one.
+- NGS-off collapsing `bookkeeping` (5.8–7.6 ms → 0.4–0.5 ms) corroborates the native finding
+  that position projection dominates an active contact graph. It does not decompose
+  `bookkeeping`, which also contains row building and the impulse-cache save.
+- The stage split is **opt-in and off by default**, so the default step pays no measurement
+  overhead. With it on, the clock reads are themselves work.
+- Small scenes resolve nothing: a six-body step is shorter than the browser's coarsened clock,
+  so the stage rows read `BELOW CLOCK QUANTUM`. That is the timer, not the engine.
+- The visual review used the thread preview at a narrow viewport plus Playwright captures at
+  1440/1024/390 (`dash-desktop.png`, `dash-tablet.png`, `dash-mobile.png` and their
+  `-panel` variants). The preview webview stopped compositing partway through the session, so
+  the later captures were taken by Playwright headless instead.
+
+## Suites run on this build
+
+| suite | assertions | receipt |
+|---|---:|---|
+| `check.cjs` (unchanged) | 221 | [polish-results.log](polish-results.log) |
+| `framing.cjs` (unchanged) | 50 | [framing-results.log](framing-results.log) |
+| `dashboard.cjs` (new) | 87 | [dashboard-results.log](dashboard-results.log) |
+
+All three exit 0 with an empty page-error list. The native engine suite was unaffected (this
+pass touched no engine header and `web/main.cpp` is not a CMake target) and was rerun anyway:
+[142 assertions, 0 failed](native-engine.log).

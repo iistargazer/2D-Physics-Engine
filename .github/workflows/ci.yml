@@ -1,0 +1,31 @@
+name: phys2d checks
+on: [push, pull_request]
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [release, sanitizers]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        shell: bash
+        run: |
+          flags='-Wall -Wextra -Wpedantic -Werror'
+          if [ '${{ matrix.mode }}' = sanitizers ]; then
+            flags="$flags -fsanitize=address,undefined -fno-omit-frame-pointer"
+          fi
+          cmake -S . -B build/ci -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS="$flags"
+      - run: cmake --build build/ci --parallel 2
+      - run: ctest --test-dir build/ci --output-on-failure
+        env:
+          ASAN_OPTIONS: detect_leaks=1
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+  sfml-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install SFML
+        run: sudo apt-get update && sudo apt-get install -y libsfml-dev
+      - run: cmake -S . -B build/demo -DPHYS_BUILD_DEMO=ON -DCMAKE_CXX_FLAGS='-Wall -Wextra -Wpedantic -Werror'
+      - run: cmake --build build/demo --parallel 2

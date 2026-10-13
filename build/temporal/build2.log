@@ -1,0 +1,14 @@
+[  7%] Built target test_engine
+[ 18%] Built target test_ccd_allocations
+[ 22%] Building CXX object CMakeFiles/test_world_storage.dir/test_world_storage.cpp.obj
+[ 33%] Built target test_temporal
+[ 40%] Built target benchmark_broadphase
+[ 48%] Built target demo_broadphase
+[ 55%] Built target benchmark_stability
+[ 62%] Built target benchmark_joints
+[ 70%] Built target benchmark_ccd
+[ 77%] Built target study_integrators
+[ 85%] Built target benchmark_showcase
+[ 92%] Built target benchmark_sleeping
+[ 96%] Linking CXX executable test_world_storage.exe
+[100%] Built target test_world_storage

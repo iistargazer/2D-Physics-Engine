@@ -1,0 +1,222 @@
+PASS pause reflected width=1100 DPR=1
+PASS exactly one selected scene
+PASS spawn maps 0.5,0.5 width=1100 DPR=1
+PASS spawn maps 0.02,0.05 width=1100 DPR=1
+PASS spawn maps 0.98,0.95 width=1100 DPR=1
+PASS spawn mode toggles off
+PASS switching tools is exclusive
+PASS center body grabbed through rendered surface
+PASS drag converges to mapped cursor target
+PASS release removes drag state
+PASS body re-grabbed
+PASS scene switch cancels held drag and tool state
+PASS scene reset synchronizes pause
+PASS keyboard debug reflected
+PASS button debug reflected
+PASS keyboard scene switch clears armed spawn
+PASS Space on focused pause button toggles once
+PASS pause reflected width=480 DPR=1
+PASS exactly one selected scene
+PASS spawn maps 0.5,0.5 width=480 DPR=1
+PASS spawn maps 0.02,0.05 width=480 DPR=1
+PASS spawn maps 0.98,0.95 width=480 DPR=1
+PASS spawn mode toggles off
+PASS switching tools is exclusive
+PASS center body grabbed through rendered surface
+PASS drag converges to mapped cursor target
+PASS release removes drag state
+PASS body re-grabbed
+PASS scene switch cancels held drag and tool state
+PASS scene reset synchronizes pause
+PASS keyboard debug reflected
+PASS button debug reflected
+PASS keyboard scene switch clears armed spawn
+PASS Space on focused pause button toggles once
+PASS pause reflected width=1500 DPR=1
+PASS exactly one selected scene
+PASS spawn maps 0.5,0.5 width=1500 DPR=1
+PASS spawn maps 0.02,0.05 width=1500 DPR=1
+PASS spawn maps 0.98,0.95 width=1500 DPR=1
+PASS spawn mode toggles off
+PASS switching tools is exclusive
+PASS center body grabbed through rendered surface
+PASS drag converges to mapped cursor target
+PASS release removes drag state
+PASS body re-grabbed
+PASS scene switch cancels held drag and tool state
+PASS scene reset synchronizes pause
+PASS keyboard debug reflected
+PASS button debug reflected
+PASS keyboard scene switch clears armed spawn
+PASS Space on focused pause button toggles once
+PASS scene 0 explanation and title synchronized
+PASS scene 0 narrow layout has no page overflow
+PASS scene 0 camera center renders at viewport center
+PASS scene 0 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 1 explanation and title synchronized
+PASS scene 1 narrow layout has no page overflow
+PASS scene 1 camera center renders at viewport center
+PASS scene 1 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 2 explanation and title synchronized
+PASS scene 2 narrow layout has no page overflow
+PASS scene 2 camera center renders at viewport center
+PASS scene 2 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 3 explanation and title synchronized
+PASS scene 3 narrow layout has no page overflow
+PASS scene 3 camera center renders at viewport center
+PASS scene 3 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 4 explanation and title synchronized
+PASS scene 4 narrow layout has no page overflow
+PASS scene 4 camera center renders at viewport center
+PASS scene 4 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 5 explanation and title synchronized
+PASS scene 5 narrow layout has no page overflow
+PASS scene 5 camera center renders at viewport center
+PASS scene 5 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 6 explanation and title synchronized
+PASS scene 6 narrow layout has no page overflow
+PASS scene 6 camera center renders at viewport center
+PASS scene 6 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 7 explanation and title synchronized
+PASS scene 7 narrow layout has no page overflow
+PASS scene 7 camera center renders at viewport center
+PASS scene 7 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS stress evidence states performance boundary
+PASS scene 8 explanation and title synchronized
+PASS scene 8 narrow layout has no page overflow
+PASS scene 8 camera center renders at viewport center
+PASS scene 8 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 9 explanation and title synchronized
+PASS scene 9 narrow layout has no page overflow
+PASS scene 9 camera center renders at viewport center
+PASS scene 9 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS non-default 900x500 bitmap maps box spawn
+PASS right button does not spawn or grab
+PASS non-default bitmap body grabbed
+PASS held drag remaps after resize
+PASS grab established before focus loss
+PASS blur entry point removes active drag
+PASS empty-space pick creates no drag
+PASS scene reset discards queued step before first paused frame
+PASS pause reflected width=1100 DPR=2
+PASS exactly one selected scene
+PASS spawn maps 0.5,0.5 width=1100 DPR=2
+PASS spawn maps 0.02,0.05 width=1100 DPR=2
+PASS spawn maps 0.98,0.95 width=1100 DPR=2
+PASS spawn mode toggles off
+PASS switching tools is exclusive
+PASS center body grabbed through rendered surface
+PASS drag converges to mapped cursor target
+PASS release removes drag state
+PASS body re-grabbed
+PASS scene switch cancels held drag and tool state
+PASS scene reset synchronizes pause
+PASS keyboard debug reflected
+PASS button debug reflected
+PASS keyboard scene switch clears armed spawn
+PASS Space on focused pause button toggles once
+PASS pause reflected width=480 DPR=2
+PASS exactly one selected scene
+PASS spawn maps 0.5,0.5 width=480 DPR=2
+PASS spawn maps 0.02,0.05 width=480 DPR=2
+PASS spawn maps 0.98,0.95 width=480 DPR=2
+PASS spawn mode toggles off
+PASS switching tools is exclusive
+PASS center body grabbed through rendered surface
+PASS drag converges to mapped cursor target
+PASS release removes drag state
+PASS body re-grabbed
+PASS scene switch cancels held drag and tool state
+PASS scene reset synchronizes pause
+PASS keyboard debug reflected
+PASS button debug reflected
+PASS keyboard scene switch clears armed spawn
+PASS Space on focused pause button toggles once
+PASS pause reflected width=1500 DPR=2
+PASS exactly one selected scene
+PASS spawn maps 0.5,0.5 width=1500 DPR=2
+PASS spawn maps 0.02,0.05 width=1500 DPR=2
+PASS spawn maps 0.98,0.95 width=1500 DPR=2
+PASS spawn mode toggles off
+PASS switching tools is exclusive
+PASS center body grabbed through rendered surface
+PASS drag converges to mapped cursor target
+PASS release removes drag state
+PASS body re-grabbed
+PASS scene switch cancels held drag and tool state
+PASS scene reset synchronizes pause
+PASS keyboard debug reflected
+PASS button debug reflected
+PASS keyboard scene switch clears armed spawn
+PASS Space on focused pause button toggles once
+PASS scene 0 explanation and title synchronized
+PASS scene 0 narrow layout has no page overflow
+PASS scene 0 camera center renders at viewport center
+PASS scene 0 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 1 explanation and title synchronized
+PASS scene 1 narrow layout has no page overflow
+PASS scene 1 camera center renders at viewport center
+PASS scene 1 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 2 explanation and title synchronized
+PASS scene 2 narrow layout has no page overflow
+PASS scene 2 camera center renders at viewport center
+PASS scene 2 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 3 explanation and title synchronized
+PASS scene 3 narrow layout has no page overflow
+PASS scene 3 camera center renders at viewport center
+PASS scene 3 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 4 explanation and title synchronized
+PASS scene 4 narrow layout has no page overflow
+PASS scene 4 camera center renders at viewport center
+PASS scene 4 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 5 explanation and title synchronized
+PASS scene 5 narrow layout has no page overflow
+PASS scene 5 camera center renders at viewport center
+PASS scene 5 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 6 explanation and title synchronized
+PASS scene 6 narrow layout has no page overflow
+PASS scene 6 camera center renders at viewport center
+PASS scene 6 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 7 explanation and title synchronized
+PASS scene 7 narrow layout has no page overflow
+PASS scene 7 camera center renders at viewport center
+PASS scene 7 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS stress evidence states performance boundary
+PASS scene 8 explanation and title synchronized
+PASS scene 8 narrow layout has no page overflow
+PASS scene 8 camera center renders at viewport center
+PASS scene 8 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS scene 9 explanation and title synchronized
+PASS scene 9 narrow layout has no page overflow
+PASS scene 9 camera center renders at viewport center
+PASS scene 9 camera inverse maps spawn
+PASS restart restores factory and clears tool
+PASS non-default 900x500 bitmap maps box spawn
+PASS right button does not spawn or grab
+PASS non-default bitmap body grabbed
+PASS held drag remaps after resize
+PASS grab established before focus loss
+PASS blur entry point removes active drag
+PASS empty-space pick creates no drag
+PASS scene reset discards queued step before first paused frame
+PASS no browser runtime errors: []
+TOTAL 221 assertions

@@ -1,0 +1,88 @@
+PASS scene 0: BODIES tile matches the frame buffer (6)
+PASS scene 0: AWAKE/ASLEEP/STATIC tiles match the decoded body states
+PASS scene 0: CONTACT POINTS tile matches the frame buffer
+PASS scene 3: BODIES tile matches the frame buffer (7)
+PASS scene 3: AWAKE/ASLEEP/STATIC tiles match the decoded body states
+PASS scene 3: CONTACT POINTS tile matches the frame buffer
+PASS scene 9: BODIES tile matches the frame buffer (5)
+PASS scene 9: AWAKE/ASLEEP/STATIC tiles match the decoded body states
+PASS scene 9: CONTACT POINTS tile matches the frame buffer
+PASS scene 7: BODIES tile matches the frame buffer (5001)
+PASS scene 7: AWAKE/ASLEEP/STATIC tiles match the decoded body states
+PASS scene 7: CONTACT POINTS tile matches the frame buffer
+PASS a freshly built world reports no simulated steps
+PASS step counter equals the number of driven steps (5)
+PASS cradle: a sub-millisecond step is not flagged over budget
+PASS cradle: budget verdict reads WITHIN BUDGET
+PASS cradle: the status pill is not in the over-budget state
+PASS cradle: composition segments sum to the whole
+PASS cradle: composition segments are the real static/awake proportions
+PASS cradle: the asleep segment is empty for a world with no sleepers
+PASS stress field reaches island sleeping under the default settings
+PASS turning island sleeping off wakes the whole settled field (awake=5000)
+PASS sleeping toggle reflects the engine state
+PASS sustained load: every dynamic body stays awake with sleeping off
+PASS sustained load: 10000 contact points are tracked
+PASS sustained load: BODIES tile still matches (5001)
+PASS budget gauge width equals the measured step (93.2% vs 93.2%)
+PASS over-budget styling follows the measured step (31.08 ms)
+PASS step-cost history collected (120 samples)
+PASS step-cost history reports its own peak: 120 FRAMES · PEAK 34.47 ms
+PASS step-cost history is actually plotted to the canvas
+PASS stage panel starts dimmed while profiling is off
+PASS stage panel is labelled PROFILE OFF by default
+PASS profiling is off by default
+PASS enabling the profile labels the panel
+PASS enabling the profile undims the panel
+PASS stage breakdown resolves on a loaded field (Σ 31.34 ms)
+PASS stage total is reported (Σ 31.34 ms / 31.61 ms)
+PASS the seven stages reconcile with the step (Σ 31.34 vs 31.61 ms)
+PASS broadphase and solve both report measured time
+PASS the islands stage is idle with island sleeping switched off
+PASS every stage row reports a measured value
+PASS bar share for the largest stage (bookkeeping) equals the engine's own figure
+PASS iterations slider writes through to the solver
+PASS raising iterations 10 -> 120 multiplies the solve stage (6.49 -> 67.28 ms)
+PASS the measured step follows the solver configuration (92.88 ms)
+PASS an over-budget running world carries the strain state (95.60 ms, 100%)
+PASS an over-budget running world says so in words
+PASS a running, fully awake world reports ACTIVE (got ACTIVE)
+PASS disabling NGS collapses the projection cost (14.58 -> 0.95 ms)
+PASS disabling the profile zeroes the stage bars
+PASS the re-enabled field sleeps again (awake=0, asleep=5000)
+PASS AWAKE tile reports the settled state
+PASS state pill reads SLEEPING for a settled field (got SLEEPING)
+PASS a settled field is not in the strain state
+PASS a settled field costs less than the same field awake (13.27 vs 31.08 ms)
+PASS gauge still equals the measured step once settled (39.8% vs 39.8%)
+PASS over-budget styling stays consistent with the measured step once settled (13.27 ms)
+PASS P enables the stage profile
+PASS G enables position correction
+PASS S enables island sleeping
+PASS cradle seeds the sliders from its own factory (40 iterations)
+PASS gravity readout matches the scene (-9.81)
+PASS gravity readout keeps the factory value at two decimals
+PASS iterations readout mirrors the scene
+PASS the default solver mode is reported as PGS
+PASS iterations readout follows the slider
+PASS restart resets the slider to the factory value
+PASS restart re-syncs opt-in NGS from the new world
+PASS momentum row ships with zero gravity
+PASS gravity slider writes through to the world
+PASS the zero-gravity row lifts under the new gravity (max y=1.27 m)
+PASS the simulation clock counts exactly the driven steps
+PASS no horizontal overflow with the dashboard present at 390px
+PASS no horizontal overflow with the dashboard present at 480px
+PASS no horizontal overflow with the dashboard present at 1100px
+PASS no horizontal overflow with the dashboard present at 1500px
+PASS the engine-unavailable panel stays hidden while the runtime is healthy
+PASS no browser runtime errors: []
+PASS first-run guidance is visible on a fresh install
+PASS first-run guidance actually says what to do
+PASS first-run guidance dismisses on demand
+PASS dismissal is remembered across a reload
+PASS reduced motion disables the stage sweep
+PASS reduced motion disables the pulsing indicators
+PASS reduced motion disables the scene-change wipe
+PASS the dashboard still measures under reduced motion
+TOTAL 87 assertions

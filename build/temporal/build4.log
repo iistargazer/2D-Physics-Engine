@@ -1,0 +1,15 @@
+[  6%] Built target test_engine
+[ 16%] Built target test_ccd_allocations
+[ 26%] Built target test_world_storage
+[ 36%] Built target test_temporal
+[ 40%] Building CXX object CMakeFiles/test_rows.dir/test_rows.cpp.obj
+[ 46%] Built target benchmark_broadphase
+[ 53%] Built target demo_broadphase
+[ 60%] Built target benchmark_stability
+[ 66%] Built target benchmark_joints
+[ 73%] Built target study_integrators
+[ 80%] Built target benchmark_ccd
+[ 86%] Built target benchmark_showcase
+[ 93%] Built target benchmark_sleeping
+[ 96%] Linking CXX executable test_rows.exe
+[100%] Built target test_rows

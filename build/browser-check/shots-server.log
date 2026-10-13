@@ -1,0 +1,11 @@
+127.0.0.1 - - [13/Oct/2026 21:14:34] "GET /dash-desktop.png HTTP/1.1" 200 -
+127.0.0.1 - - [13/Oct/2026 21:15:41] "GET /dash-desktop.png HTTP/1.1" 200 -
+127.0.0.1 - - [13/Oct/2026 21:15:50] "GET /dash-desktop.png HTTP/1.1" 200 -
+127.0.0.1 - - [13/Oct/2026 21:15:52] code 404, message File not found
+127.0.0.1 - - [13/Oct/2026 21:15:52] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [13/Oct/2026 21:19:17] "GET /dash-desktop-panel.png HTTP/1.1" 200 -
+127.0.0.1 - - [13/Oct/2026 21:19:22] code 404, message File not found
+127.0.0.1 - - [13/Oct/2026 21:19:22] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [13/Oct/2026 21:19:46] "GET /dash-mobile-panel.png HTTP/1.1" 200 -
+127.0.0.1 - - [13/Oct/2026 21:20:23] code 404, message File not found
+127.0.0.1 - - [13/Oct/2026 21:20:23] "GET /favicon.ico HTTP/1.1" 404 -

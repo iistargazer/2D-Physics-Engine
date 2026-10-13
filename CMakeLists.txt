@@ -1,0 +1,52 @@
+cmake_minimum_required(VERSION 3.16)
+project(phys2d LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Header-only engine
+add_library(phys INTERFACE)
+target_include_directories(phys INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+if(MSVC)
+  target_compile_options(phys INTERFACE /W4)
+else()
+  target_compile_options(phys INTERFACE -Wall -Wextra -Wpedantic)
+endif()
+
+# Headless regression tests (run after EVERY engine change)
+add_executable(test_engine test_engine.cpp)
+target_link_libraries(test_engine PRIVATE phys)
+enable_testing()
+add_test(NAME engine COMMAND test_engine)
+add_executable(test_ccd_allocations test_ccd_allocations.cpp test_allocation_counter.cpp)
+target_link_libraries(test_ccd_allocations PRIVATE phys)
+add_test(NAME ccd_allocations COMMAND test_ccd_allocations)
+add_executable(test_world_storage test_world_storage.cpp test_allocation_counter.cpp)
+target_link_libraries(test_world_storage PRIVATE phys)
+add_test(NAME world_storage COMMAND test_world_storage)
+add_executable(test_temporal test_temporal.cpp test_allocation_counter.cpp)
+target_link_libraries(test_temporal PRIVATE phys)
+add_test(NAME temporal COMMAND test_temporal)
+add_executable(test_rows test_rows.cpp test_allocation_counter.cpp)
+target_link_libraries(test_rows PRIVATE phys)
+add_test(NAME rows COMMAND test_rows)
+
+# Broadphase benchmark and headless demonstration (no external dependencies).
+add_executable(benchmark_broadphase benchmark_broadphase.cpp)
+target_link_libraries(benchmark_broadphase PRIVATE phys)
+add_executable(demo_broadphase demo_broadphase.cpp)
+target_link_libraries(demo_broadphase PRIVATE phys)
+
+foreach(program benchmark_stability benchmark_joints benchmark_ccd study_integrators benchmark_showcase benchmark_sleeping benchmark_active)
+  add_executable(${program} ${program}.cpp)
+  target_link_libraries(${program} PRIVATE phys)
+endforeach()
+
+# Optional SFML 2.x demo.
+option(PHYS_BUILD_DEMO "Build SFML demo" OFF)
+if(PHYS_BUILD_DEMO AND EXISTS ${CMAKE_SOURCE_DIR}/demo/main.cpp)
+  find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
+  add_executable(demo demo/main.cpp)
+  target_link_libraries(demo PRIVATE phys sfml-graphics sfml-window sfml-system)
+endif()

@@ -1,0 +1,51 @@
+PASS dynamic scene geometry framed 0 at 1280
+PASS no horizontal page overflow 1280
+PASS dynamic scene geometry framed 1 at 1280
+PASS no horizontal page overflow 1280
+PASS dynamic scene geometry framed 2 at 1280
+PASS no horizontal page overflow 1280
+PASS dynamic scene geometry framed 3 at 1280
+PASS no horizontal page overflow 1280
+PASS dynamic scene geometry framed 4 at 1280
+PASS no horizontal page overflow 1280
+PASS dynamic scene geometry framed 5 at 1280
+PASS no horizontal page overflow 1280
+PASS dynamic scene geometry framed 6 at 1280
+PASS no horizontal page overflow 1280
+PASS dynamic scene geometry framed 7 at 1280
+PASS no horizontal page overflow 1280
+PASS dynamic scene geometry framed 8 at 1280
+PASS no horizontal page overflow 1280
+PASS dynamic scene geometry framed 9 at 1280
+PASS no horizontal page overflow 1280
+PASS car camera follows rendered chassis
+PASS follow-camera body pick uses inverse transform
+PASS follow camera freezes while dragging
+PASS slow speed acknowledges selection
+PASS restart preserves visible slow setting
+PASS dynamic scene geometry framed 0 at 390
+PASS no horizontal page overflow 390
+PASS dynamic scene geometry framed 1 at 390
+PASS no horizontal page overflow 390
+PASS dynamic scene geometry framed 2 at 390
+PASS no horizontal page overflow 390
+PASS dynamic scene geometry framed 3 at 390
+PASS no horizontal page overflow 390
+PASS dynamic scene geometry framed 4 at 390
+PASS no horizontal page overflow 390
+PASS dynamic scene geometry framed 5 at 390
+PASS no horizontal page overflow 390
+PASS dynamic scene geometry framed 6 at 390
+PASS no horizontal page overflow 390
+PASS dynamic scene geometry framed 7 at 390
+PASS no horizontal page overflow 390
+PASS dynamic scene geometry framed 8 at 390
+PASS no horizontal page overflow 390
+PASS dynamic scene geometry framed 9 at 390
+PASS no horizontal page overflow 390
+PASS car camera follows rendered chassis
+PASS follow-camera body pick uses inverse transform
+PASS follow camera freezes while dragging
+PASS slow speed acknowledges selection
+PASS restart preserves visible slow setting
+TOTAL 50 assertions

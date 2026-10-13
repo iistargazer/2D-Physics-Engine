@@ -1,0 +1,173 @@
+[mass properties]
+  ok:   box I = m(w^2+h^2)/12 = 1.2500
+  ok:   polygon I matches box (1.2500), CW input + offset handled
+  ok:   vertices re-centred on centroid
+  ok:   circle I = m r^2 / 2 = 0.2500
+[symplectic Euler: harmonic oscillator energy]
+  ok:   no secular drift over 1000 s: late max 52.6316 vs early max 52.6316 (E0=50.0)
+  ok:   bounded oscillation ~ omega*dt: 10.0% of E0
+  ok:   explicit Euler blows up in 20 s: E/E0 = 439286205 (shown for contrast)
+[box dropped on ground]
+  ok:   rests at y = 0.4972 (expected ~0.49-0.5)
+  ok:   settles flat, angle mod 90deg = -0.0008
+  ok:   at rest (|v|=0.0000, w=-0.0000)
+[circle restitution]
+  ok:   first rebound height = 3.27 (ideal 3.2)
+[Coulomb friction on a 0.35 rad slope: tan(0.35)=0.365]
+  ok:   mu=0.60 > tan(theta): holds, slid 0.001 m
+  ok:   mu=0.05 < tan(theta): slides, 13.14 m in 3 s
+[3-box stack]
+  ok:   top box y = 2.492 (ideal 2.5)
+  ok:   no lateral drift: x = 0.0000
+  ok:   stack at rest: |v| = 0.0000
+[AABB geometry]
+  ok:   touching bounds overlap conservatively
+  ok:   separated bounds reject
+  ok:   fat containment and perimeter
+  ok:   circle bounds
+  ok:   rotated polygon bounds
+[dynamic tree: sorted insertion, movement, removal, reuse]
+  ok:   sorted insertion stays balanced, height=10
+  ok:   small motion retains fat proxy
+  ok:   teleport reinserts proxy
+  ok:   query finds teleported leaf only
+  ok:   removal through empty tree preserves invariants
+  ok:   free-list reuse has no stale leaf
+[broadphase: fixed-seed oracle and public body mutations]
+  ok:   identical narrowphase contact-pair sets over 50 randomized frames
+  ok:   candidate pairs exactly equal tight-AABB oracle, sorted and unique
+  ok:   tree invariants survive rotation, teleport, grow, erase, reorder, replacement
+  ok:   empty world resets proxies
+  ok:   static/static pairs omitted
+[world: deterministic tree vs all-pairs trajectories]
+  ok:   bit-identical trajectories over 600 fixed steps
+  ok:   all simulated states remain finite
+[persistent feature IDs and warm impulses]
+  ok:   clipped contact IDs are distinct and stable under tangential motion
+  ok:   cached normal and tangent impulses actually seed body velocity
+  ok:   cold-start option clears accumulated impulses
+  ok:   teleport invalidates old support impulses
+[warm-start 20-box stack and 15-row pyramid: 20 seconds]
+  ok:   20-box stack stable: speed=0.00000 drift=0.00000 tilt=0.00000 depth=0.01000
+  ok:   stack retains height: top=19.3878 ideal=19.5
+  ok:   15-row pyramid stable: speed=0.00000 drift=0.00244 tilt=0.00134 depth=0.01000
+  ok:   pyramid retains height: top=14.3791 ideal=14.5
+[joint constraints]
+  ok:   distance frequency=0.0 reaches rest length: 1.00000000
+  ok:   distance frequency=3.0 reaches rest length: 1.00000000
+  ok:   small-angle pendulum period=2.8333 s
+  ok:   10-link revolute chain anchor error=0.000035
+  ok:   motor reaches prescribed speed
+  ok:   motor respects angular limit: angle=0.300000
+  ok:   mouse spring converges to target
+  ok:   prismatic constrains intended degrees of freedom
+  ok:   weld constrains intended degrees of freedom
+[NGS and sleeping islands]
+  ok:   NGS reduces overlap without adding kinetic velocity: y=0.477785
+  ok:   contact-connected stack sleeps as one island
+  ok:   external force wakes the entire connected island
+  ok:   static floor does not merge independent islands
+  ok:   nonpositive dt rejected
+[continuous shape casts and thin bullets]
+  ok:   circle bullet 200 m/s stops before 0.02m wall: x=-0.050000 events=1 pushed=0
+  ok:   static wall is never moved by the sweep
+  ok:   circle bullet ends the step out of the wall (depth=0.000000)
+  ok:   head-on circle impact absorbs the normal velocity: vx=0.000000000
+  ok:   circle comes to rest with no invented spin: |v|=0.000000000 |w|=0.000000000
+  ok:   circle resolves inside the sweep with no fallback: clamped=0 pushedOut=0 unconverged=0
+  ok:   circle bullet 1000 m/s stops before 0.02m wall: x=-0.050000 events=1 pushed=0
+  ok:   static wall is never moved by the sweep
+  ok:   circle bullet ends the step out of the wall (depth=0.000000)
+  ok:   head-on circle impact absorbs the normal velocity: vx=0.000000000
+  ok:   circle comes to rest with no invented spin: |v|=0.000000000 |w|=0.000000000
+  ok:   circle resolves inside the sweep with no fallback: clamped=0 pushedOut=0 unconverged=0
+  ok:   circle bullet 10000 m/s stops before 0.02m wall: x=-0.050000 events=1 pushed=0
+  ok:   static wall is never moved by the sweep
+  ok:   circle bullet ends the step out of the wall (depth=0.000000)
+  ok:   head-on circle impact absorbs the normal velocity: vx=0.000000000
+  ok:   circle comes to rest with no invented spin: |v|=0.000000000 |w|=0.000000000
+  ok:   circle resolves inside the sweep with no fallback: clamped=0 pushedOut=0 unconverged=0
+  ok:   thin polygon bullet 200 m/s stops before 0.02m wall: x=-0.050799 events=1 pushed=0
+  ok:   static wall is never moved by the sweep
+  ok:   polygon bullet ends the step out of the wall (depth=0.000000)
+  ok:   tilted polygon impact absorbs the normal velocity: vx=0.000000000
+  ok:   tilted polygon comes to rest with no invented spin: |v|=0.000000000 |w|=0.000000000
+  ok:   tilted polygon resolves inside the sweep with no fallback: clamped=0 pushedOut=0 unconverged=0
+  ok:   thin polygon bullet 1000 m/s stops before 0.02m wall: x=-0.050799 events=1 pushed=0
+  ok:   static wall is never moved by the sweep
+  ok:   polygon bullet ends the step out of the wall (depth=0.000000)
+  ok:   tilted polygon impact absorbs the normal velocity: vx=0.000000000
+  ok:   tilted polygon comes to rest with no invented spin: |v|=0.000000000 |w|=0.000000000
+  ok:   tilted polygon resolves inside the sweep with no fallback: clamped=0 pushedOut=0 unconverged=0
+  ok:   thin polygon bullet 10000 m/s stops before 0.02m wall: x=-0.050799 events=1 pushed=0
+  ok:   static wall is never moved by the sweep
+  ok:   polygon bullet ends the step out of the wall (depth=0.000000)
+  ok:   tilted polygon impact absorbs the normal velocity: vx=0.000000000
+  ok:   tilted polygon comes to rest with no invented spin: |v|=0.000000000 |w|=0.000000000
+  ok:   tilted polygon resolves inside the sweep with no fallback: clamped=0 pushedOut=0 unconverged=0
+  ok:   spinning thin bullet does not tunnel: x=-0.310636
+  ok:   spinning plate is held without losing its spin: |v|=0.000000000 w=60.000000
+  ok:   unrelated body keeps integrating during a bullet step: x=0.050000000 (expected 0.050000000)
+  ok:   already-touching pair is skipped by CCD and pushed out discretely: x=0.400000
+  ok:   unobstructed bullet travels the full step: x=8.000000000
+  ok:   moving/moving circle TOI matches analytic root: 0.15000000
+  ok:   separated sweep is not a false impact
+  ok:   separated motionless pair reports no contact and no unresolved state
+  ok:   overlapping start is reported instead of silently cast forward
+[smooth-force policy convergence]
+  ok:   symplectic first-order convergence ratio 2.0403
+  ok:   Verlet second-order convergence ratio 4.0031
+  ok:   RK4 fourth-order convergence ratio 16.1013
+[fixed-seed randomized no-gravity elastic fuzz]
+  ok:   fuzz has no nonfinite state over 2000 steps
+  ok:   fixed seed produces bit-identical repeated trajectories
+  ok:   fuzz has no energy blow-up: max/initial=1.00000000
+[showcase smoke: every scene factory stays finite]
+  ok:   all 10 showcase scene factories produce finite states
+  ok:   phase timing instrumentation produces nonnegative measurements
+[Newton's cradle: momentum transfer]
+  ok:   total x momentum conserved: 5.000000000 -> 5.000000000
+  ok:   incoming ball stops: vx=0.000000000
+  ok:   far ball leaves with the incoming speed: 5.000000 m/s
+  ok:   far ball keeps the momentum: 5.000000
+[pendulum cradle swings the far ball]
+  ok:   far ball is driven by the chain: peak speed=2.1354 m/s
+  ok:   far ball swings out: reached x=2.6398 (anchor 2.1396)
+[domino cascade travels the row]
+  ok:   every plank starts upright: 45/45
+  ok:   the far plank cannot know about the nudge yet: |angle|=0.000000 rad
+  ok:   the wave propagates one plank at a time: standing 44 -> 33 -> 14 -> 0
+  ok:   the last plank falls flat: |angle|=1.5708 rad
+  ok:   without the nudge the row is inert for 10 s: max |angle|=0.000000000 rad
+[ragdoll limits and settling]
+  ok:   revolute limits hold: worst relative angle=1.5002 rad (limit 1.5)
+  ok:   the ragdoll settles to rest: max |v|=0.000000 m/s
+  ok:   the ragdoll rests on the floor instead of hovering: lowest point y=-0.00726
+  ok:   the head stays above the torso after landing: 3.235 > 2.094
+  info: ragdoll anchor error 0.034975 m (worst warm-started joint in the project)
+[bullet vs wall showcase scene]
+  ok:   the bullet closes 15 m of distance in one step: x=-12.0000 -> -0.076436
+  ok:   the bullet stops before the wall instead of appearing behind it: x=-0.076436115
+  ok:   the bullet comes to rest at the wall: |v|=0.000000000 |w|=0.000000000
+  ok:   the impact is a resolved event, not a capped budget: events=1 capped=0
+  ok:   the resting bullet never creeps through the wall and never moves the wall: x=-0.076436115
+[motorized car with prismatic suspension]
+  ok:   wheels spin freely through the prismatic axle (lockAngle=false): peak |w|=63.32 rad/s, turned 2.63 rad
+  ok:   car drives itself across the terrain: 48.90 m
+  ok:   car never tips over: max |angle|=0.322 rad
+  ok:   car finishes level: 0.0038 rad
+  ok:   suspension compresses and extends under load: 0.0082..0.7153 m (rest 0.70)
+[Rube-Goldberg causality switch]
+  ok:   with the trigger the machine completes: flag angle=-1.5684 rad
+  ok:   without the trigger nothing moves: flag angle=0.0000 rad
+[wrecking-ball pyramid]
+  ok:   ball has not reached the pile yet: x=-13.402
+  ok:   pyramid is at rest while the ball swings in: max |v|=0.00234 m/s
+  ok:   pyramid is wrecked after the impact: max drift=8.5180 m
+[stress 5000: settling, islands and sleep]
+  ok:   settled field sleeps: 5000/5001 dynamic bodies asleep
+  ok:   sleeping stops residual drift: max |v|=0.000000
+[100-plank suspension bridge]
+  ok:   100-plank bridge projection max anchor error=0.010674
+
+ALL TESTS PASSED (0 failed)

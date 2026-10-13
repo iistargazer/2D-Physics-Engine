@@ -1,0 +1,3 @@
+[ 33%] Building CXX object CMakeFiles/test_world_storage.dir/test_world_storage.cpp.obj
+[ 66%] Linking CXX executable test_world_storage.exe
+[100%] Built target test_world_storage

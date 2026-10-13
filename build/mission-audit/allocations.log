@@ -1,0 +1,1 @@
+PASS: 200 allocation-free casts match copy oracle exactly; hit=160 miss=20 touching=20 exhausted=0; SweepPose=48 align=8

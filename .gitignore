@@ -1,0 +1,67 @@
+# phys2d ignore rules.
+#
+# Policy: `build/` is disposable local output (PHYSICS_ENGINE_GUIDE.md §2 says receipts
+# there are "not guaranteed to exist in a clean clone"). Toolchains, vendored
+# dependencies, compiled binaries, generated HTML replays and dev-server logs are never
+# committed.
+#
+# Exception: the small *textual* evidence files that the documentation cites as receipts
+# (logs, benchmark CSVs, the energy SVG, exit-status files) ARE committed, because a
+# reader following a `build/...` link should find the file instead of a 404. The
+# exception is by file type and directory, listed explicitly below.
+#
+# Exception: the nine browser assets the showcase actually serves are committed under
+# build/web/ (README: "The output is nine required files ... Keep them together").
+
+# ---- build output, toolchains, vendored dependencies -------------------------------
+/build/**
+# directory shells needed before any nested file can be re-included
+!/build/browser-check/
+!/build/mission-audit/
+!/build/prepared/
+!/build/temporal/
+!/build/web/
+# textual receipts cited by the docs (top level of build/)
+!/build/*.csv
+!/build/*.log
+!/build/*.err
+!/build/*.svg
+# textual receipts inside the documented receipt directories
+!/build/browser-check/*.log
+!/build/mission-audit/*.log
+!/build/mission-audit/*.exit
+!/build/prepared/*.csv
+!/build/prepared/*.log
+!/build/prepared/*.exit
+!/build/temporal/*.log
+# the nine assets served by the browser showcase (nothing else in build/web/)
+!/build/web/index.html
+!/build/web/index.js
+!/build/web/index.wasm
+!/build/web/showcase.css
+!/build/web/core.js
+!/build/web/scenes.js
+!/build/web/render.js
+!/build/web/instrument.js
+!/build/web/showcase.js
+
+# generated HTML frame replays: reproduce with
+#   ./build/demo_broadphase build/<scene>_demo.html <scene>
+/build/*.html
+
+# compiled objects and binaries anywhere (safety net)
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.pdb
+
+# ---- local client metadata, editor and OS cruft ------------------------------------
+.freebuff/
+.DS_Store
+Thumbs.db
+*.swp
+*~

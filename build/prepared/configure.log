@@ -1,0 +1,9 @@
+-- The CXX compiler identification is GNU 13.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/msys64/ucrt64/bin/g++.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (3.7s)
+-- Generating done (0.7s)
+-- Build files have been written to: C:/Users/rohan/Downloads/2D Physics Engine/build/prepared/cmake

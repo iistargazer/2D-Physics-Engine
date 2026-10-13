@@ -1,0 +1,3 @@
+[ 50%] Building CXX object CMakeFiles/demo.dir/demo/main.cpp.obj
+[100%] Linking CXX executable demo.exe
+[100%] Built target demo

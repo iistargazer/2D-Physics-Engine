@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="An interactive field notebook for a hand-written C++20 rigid-body engine. Ten experiments, live WebAssembly physics, and measured engineering trade-offs.">
+<title>phys2d / The mechanics lab</title>
+<meta name="color-scheme" content="dark">
+<!-- Inline mark: a lime body above a static slab. Avoids a favicon round-trip that
+     would 404 on a static host, and keeps the page free of external requests. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f1412'/%3E%3Crect x='6' y='22' width='20' height='4' fill='%23526158'/%3E%3Ccircle cx='16' cy='13' r='7' fill='%23c1dc97'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="showcase.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<header class="masthead"><a class="wordmark" href="#">phys<span>2d</span><small>THE MECHANICS LAB</small></a><span class="build-label">C++20 → WEBASSEMBLY <i></i> LIVE CORE</span></header>
+<main>
+  <section class="intro"><p class="eyebrow">FROM FIRST PRINCIPLES / AN INTERACTIVE FIELD NOTEBOOK</p><h1>Small worlds.<br><em>Real mechanics.</em></h1><p class="lede">Ten experiments in motion, contact and constraint. A hand-written rigid-body engine—not a physics library in disguise.</p></section>
+
+  <p class="first-run" id="firstRun" role="note">
+    <span class="first-run-tag">FIRST RUN</span>
+    <span class="first-run-steps"><b>1.</b> Pick an experiment. <b>2.</b> Drag a body, or arm <b>+ Box</b> and click the stage. <b>3.</b> Pause and press <kbd>N</kbd> to advance one fixed step, then read the telemetry below.</span>
+    <button id="firstRunDismiss" class="ghost">Got it</button>
+  </p>
+
+  <div class="workspace">
+    <aside class="scene-nav"><div class="section-label">01 — EXPERIMENTS <span>10</span></div><p class="nav-hint">Choose a system to investigate.</p><nav id="scenes" aria-label="Experiments"></nav></aside>
+    <section class="experiment" aria-labelledby="sceneTitle">
+      <header class="experiment-header"><div><p class="eyebrow" id="sceneCategory">CONTACT & CONSTRAINT</p><h2 id="sceneTitle">Newton’s cradle</h2></div><span id="runtimeStatus" class="status" role="status">Loading engine…</span></header>
+      <p id="note" class="scene-description">Five suspended balls. One release. Watch the impulse travel.</p>
+      <div class="toolbar" aria-label="Simulation controls"><div class="control-group"><button id="pause">Pause</button><button id="step" title="Advance one fixed 1/60 second step">Step <kbd>N</kbd></button><button id="restart">Restart</button></div><div class="control-group"><button id="slow">¼ speed</button><button id="debug">Contacts <kbd>D</kbd></button></div></div>
+      <div class="stage"><canvas id="canvas" width="1280" height="720" aria-label="Interactive physics experiment: drag a body or choose a spawn tool"></canvas><span class="stage-label" id="cameraLabel">WORLD VIEW / METRES</span><span class="stage-scan" aria-hidden="true"></span><span class="stage-wipe" id="stageWipe" aria-hidden="true"></span></div>
+      <div class="tools"><span id="toolHint" role="status">Drag a body to disturb the system.</span><div class="control-group" aria-label="Spawn tools"><button id="spawnBox">+ Box</button><button id="spawnCircle">+ Circle</button></div></div>
+      <div class="runtime-error" id="runtimeError" role="alert" hidden><strong>Engine unavailable</strong><p>The WebAssembly runtime did not start. Reload the page over HTTP and confirm <code>index.js</code> and <code>index.wasm</code> sit beside <code>index.html</code>; opening the file directly from disk will not work.</p><button id="reloadBtn" class="ghost">Reload</button></div>
+
+      <section class="dashboard" aria-labelledby="dashHead">
+        <div class="panel-head"><div class="section-label" id="dashHead">03 — TELEMETRY <span>LIVE ENGINE STATE</span></div><span class="state-pill" id="statePill"><i class="dot" id="stateDot"></i><span id="stateText">STARTING</span></span></div>
+        <div class="telemetry" id="hud" aria-label="Live simulation measurements">
+          <div><span>BODIES</span><strong id="bodyCount">—</strong></div>
+          <div><span>AWAKE</span><strong id="awakeCount">—</strong></div>
+          <div><span>ASLEEP</span><strong id="asleepCount">—</strong></div>
+          <div><span>STATIC</span><strong id="staticCount">—</strong></div>
+          <div><span>CONTACT POINTS</span><strong id="contactCount">—</strong></div>
+          <div><span>PHYSICS STEP · EMA</span><strong id="stepCost">—</strong></div>
+        </div>
+        <div class="meters">
+          <div class="meter">
+            <div class="meter-head"><span>SINGLE-STEP BUDGET</span><span id="budgetVerdict" class="verdict">—</span></div>
+            <div class="budget" id="budgetBar" role="img" aria-label="Physics step cost against a 16.67 ms frame budget"><i class="budget-fill" id="budgetFill"></i><b class="budget-mark"></b></div>
+            <p class="meter-foot">Measured step against a 60 Hz frame (<b id="budgetValue">—</b>). Simulation only, excludes rendering and the browser's own frame work.</p>
+          </div>
+          <div class="meter">
+            <div class="meter-head"><span>WORLD COMPOSITION</span><span id="simTime" class="verdict">SIM —</span></div>
+            <div class="composition" id="compositionBar" role="img" aria-label="Proportion of static, awake and sleeping bodies">
+              <i class="seg seg-static" id="segStatic"></i><i class="seg seg-asleep" id="segAsleep"></i><i class="seg seg-awake" id="segAwake"></i>
+            </div>
+            <p class="meter-foot"><span class="key awake"></span>awake <span class="key asleep"></span>asleep <span class="key static"></span>static · <b id="stepCount">0</b> steps simulated.</p>
+          </div>
+        </div>
+        <div class="spark-row">
+          <div class="spark-head"><span class="section-label">STEP COST HISTORY <span id="sparkCaption">COLLECTING…</span></span></div>
+          <canvas id="spark" width="1200" height="120" aria-label="Recent physics step cost, most recent at the right"></canvas>
+        </div>
+      </section>
+
+      <section class="phases" id="phasePanel" aria-labelledby="phaseHead">
+        <div class="panel-head"><div class="section-label" id="phaseHead">04 — STEP BREAKDOWN <span id="phaseSource">PROFILE OFF</span></div><span class="verdict" id="stageTotal">—</span></div>
+        <div class="phase-list" id="phaseList" aria-label="Per-stage cost of one physics step">
+          <div class="phase" data-stage="broadphase"><span>BROADPHASE</span><i class="phase-bar"><b></b></i><em>—</em></div>
+          <div class="phase" data-stage="narrowphase"><span>NARROWPHASE</span><i class="phase-bar"><b></b></i><em>—</em></div>
+          <div class="phase" data-stage="islands"><span>ISLANDS</span><i class="phase-bar"><b></b></i><em>—</em></div>
+          <div class="phase" data-stage="solve"><span>SOLVE</span><i class="phase-bar"><b></b></i><em>—</em></div>
+          <div class="phase" data-stage="integrate"><span>INTEGRATE</span><i class="phase-bar"><b></b></i><em>—</em></div>
+          <div class="phase" data-stage="ccd"><span>CCD</span><i class="phase-bar"><b></b></i><em>—</em></div>
+          <div class="phase" data-stage="bookkeeping"><span>BOOKKEEPING</span><i class="phase-bar"><b></b></i><em>—</em></div>
+        </div>
+        <p class="meter-foot" id="phaseNote">Stage attribution is read from the engine's own per-frame timings and is off by default, so the default step carries no measurement overhead. Enable it under tuning.</p>
+      </section>
+
+      <section class="tuning" aria-labelledby="tuneHead">
+        <div class="panel-head"><div class="section-label" id="tuneHead">05 — TUNING <span>LIVE SOLVER CONFIG</span></div><span class="verdict" id="solverMode">PGS</span></div>
+        <div class="tune-grid">
+          <div class="tune"><label for="iterations">SOLVER ITERATIONS</label><input id="iterations" type="range" min="1" max="120" step="1" value="10" disabled><output id="iterationsVal" for="iterations">10</output><p class="meter-foot">Sequential-impulse sweeps per step. Resets to the experiment's own value.</p></div>
+          <div class="tune"><label for="gravity">GRAVITY</label><input id="gravity" type="range" min="-20" max="20" step="0.01" value="-9.81" disabled><output id="gravityVal" for="gravity">-9.81</output><p class="meter-foot">Vertical acceleration in m/s², y-up. Zero is a valid experiment.</p></div>
+          <div class="tune toggles">
+            <button id="ngs" aria-pressed="false">Position correction <kbd>G</kbd></button>
+            <button id="sleeping" aria-pressed="false">Sleeping <kbd>S</kbd></button>
+            <button id="profile" aria-pressed="false">Stage profile <kbd>P</kbd></button>
+            <p class="meter-foot">Opt-in NGS projection, island sleeping, and the per-stage timing hooks. Each mirrors whatever the current experiment configured.</p>
+          </div>
+        </div>
+      </section>
+
+      <p class="timing-note">Fixed 1/60 s simulation steps. Cost excludes rendering; it is not a frame-rate claim. <span id="cadence"></span></p>
+      <div class="field-notes"><section><p class="eyebrow">WHAT TO LOOK FOR</p><p id="observe"></p></section><section><p class="eyebrow">EVIDENCE & BOUNDARIES</p><p id="evidence"></p></section></div>
+      <details class="instructions"><summary>Controls & how to read the experiment</summary><p>Drag with the primary pointer. Select + Box or + Circle, then click the canvas; select the same tool again to return to dragging. Changing experiments clears your tools and restarts the world.</p><p><kbd>1–9</kbd> / <kbd>0</kbd> select experiments · <kbd>Space</kbd> pause · <kbd>N</kbd> single step · <kbd>D</kbd> contacts · <kbd>G</kbd> position correction · <kbd>S</kbd> sleeping · <kbd>P</kbd> stage profile. Restart rewinds the current experiment. Step while paused for a precise view.</p><p><span class="legend awake"></span> Awake body <span class="legend asleep"></span> Sleeping body <span class="legend static"></span> Static geometry. Contact dots and lines show where the solver applies normal impulses. Curves in the cradle are constraint guides, not extra physics.</p><p>The telemetry panel reads the engine directly every rendered frame: body, contact and wake counts, the exponential moving average of one fixed step, a budget gauge against 60 Hz, and a history plot. Stage attribution is opt-in because measuring it is itself work; with it on, the seven stages sum toward the step cost rather than hiding work in one bucket. Browser clocks are coarsened, so a six-body step can fall below the timer's resolution and read as zero—that is the clock, not the engine.</p></details>
+    </section>
+  </div>
+  <section class="engineering"><p class="eyebrow">06 — UNDER THE SURFACE</p><h2>Built to be questioned.</h2><div class="engineering-grid"><article><span>01 / FIND</span><h3>Only test plausible pairs.</h3><p>A dynamic AABB tree prunes distant bodies. The all-pairs path stays in the native tests as a correctness oracle.</p></article><article><span>02 / RESOLVE</span><h3>Contacts become impulses.</h3><p>SAT and clipping generate manifolds. Warm-started sequential impulses resolve friction and contact; joints share the solve loop.</p></article><article><span>03 / MEASURE</span><h3>A result needs a boundary.</h3><p>The recorded native suite contains 142 passing assertions (the older saved receipt had 143; one timing assertion moved to a dedicated benchmark). That is regression evidence—not production certification or a browser performance guarantee.</p></article></div></section>
+</main>
+<footer><span>phys2d / hand-written C++20 physics</span><p>Same core as the native tests. Convex shapes only. Single-threaded. CCD remains a limited prototype; sanitizer CI has not yet been executed.</p></footer>
+<script src="core.js"></script>
+<script src="scenes.js"></script>
+<script src="render.js"></script>
+<script src="instrument.js"></script>
+<script src="showcase.js"></script>
+{{{ SCRIPT }}}
+</body>
+</html>

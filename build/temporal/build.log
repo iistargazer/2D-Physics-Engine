@@ -1,0 +1,12 @@
+[  7%] Built target test_engine
+[ 18%] Built target test_temporal
+[ 29%] Built target test_ccd_allocations
+[ 40%] Built target test_world_storage
+[ 48%] Built target benchmark_broadphase
+[ 55%] Built target demo_broadphase
+[ 62%] Built target benchmark_stability
+[ 70%] Built target benchmark_joints
+[ 77%] Built target benchmark_ccd
+[ 85%] Built target study_integrators
+[ 92%] Built target benchmark_showcase
+[100%] Built target benchmark_sleeping
