@@ -12,8 +12,12 @@
 // literally how many bodies are awake, the history plot is the last frames'
 // exponential moving averages, and the ruler's tick spacing is the same camera
 // scale the pointer inverse maps through.
+//
+// Ownership: this file is the only writer of every measurement on the page, of the
+// status stamp (setState) and of the two captions that name the budget. The stage
+// rows come from the markup, and the budget numbers come from core.js, so neither
+// list is restated here.
 // ============================================================================
-const STAGES = ['broadphase', 'narrowphase', 'islands', 'solve', 'integrate', 'ccd', 'bookkeeping'];
 const SPARK_MAX = 120;
 // Inset of the plotted series inside the canvas bitmap, in bitmap pixels. The
 // axis labels are placed from the same two numbers, so a gridline and its label
@@ -32,9 +36,13 @@ const PHASE_NOTE_BELOW =
   'Every stage measured below the browser clock\'s resolution this frame. That is the timer, not '
   + 'the engine: a small scene steps faster than the clock can tick.';
 
+// The stage rows in the shell are the single definition of the breakdown: their
+// order is the order buildStats() writes the buffer (web/main.cpp), so adding or
+// renaming a stage is one edit in the markup instead of two lists kept in step.
 const phaseRows = {};
-document.querySelectorAll('#phaseList .phase').forEach(row => {
+const STAGES = [...document.querySelectorAll('#phaseList .phase')].map(row => {
   phaseRows[row.dataset.stage] = {bar: row.querySelector('b'), val: row.querySelector('em')};
+  return row.dataset.stage;
 });
 
 const spark = $('spark');
@@ -42,6 +50,14 @@ const sparkCtx = spark.getContext('2d');
 const stepTile = document.querySelector('[data-tile="step"]');
 const axisBudget = $('axisBudget');
 const axisZero = $('axisZero');
+
+// The two places the budget is spelled out in prose, written once from the two
+// numbers in core.js rather than repeated in the markup.
+function describeBudget() {
+  $('scaleFull').textContent = GAUGE_FULL_MS.toFixed(1) + ' MS · FULL BAR';
+  $('budgetBar').setAttribute('aria-label',
+    'Physics step cost against a ' + BUDGET_MS.toFixed(2) + ' ms frame budget');
+}
 
 // A measured value with its unit set subordinate to the number: "30.03 ms".
 function valueWithUnit(text) {
@@ -63,6 +79,16 @@ const Instrument = {
   read() {
     const s = Module._stats_buffer() >> 2;
     return Module.HEAPF32.subarray(s, s + Module._stats_size());
+  },
+
+  // The status stamp's only writer. `kind` is the stamp's dress, not a second
+  // state: a running measurement, an idle one (paused or with no engine at all),
+  // or one under strain because the measured step is over budget.
+  setState(text, kind) {
+    $('stateText').textContent = text;
+    const pill = $('statePill');
+    pill.classList.toggle('idle', kind === 'idle');
+    pill.classList.toggle('strain', kind === 'strain');
   },
 
   // Mirror the engine's live configuration onto the tuning controls. Called on
@@ -132,10 +158,9 @@ const Instrument = {
     if (paused) state = 'PAUSED';
     else if (frame.awake === 0 && dynamic > 0) state = 'SLEEPING';
     else if (frame.awake > 0 && frame.asleep > 0) state = 'SETTLING';
-    $('stateText').textContent = state;
-    const pill = $('statePill');
-    pill.classList.toggle('idle', paused);
-    pill.classList.toggle('strain', !paused && over);
+    // The stamp has exactly one writer (this method, via setState) so a run state
+    // and the abort screen can never leave it in two dressings at once.
+    this.setState(state, paused ? 'idle' : over ? 'strain' : 'live');
 
     const steps = st[12] | 0;
     $('simTime').textContent = 'SIM ' + (steps / 60).toFixed(1) + ' S';
@@ -249,3 +274,7 @@ const Instrument = {
       : n + ' FRAMES · PEAK ' + (sampleMax > 0 ? fmtMs(sampleMax) : 'BELOW CLOCK QUANTUM');
   }
 };
+
+// Static captions that name the budget, filled before the engine starts so the
+// page never shows a scale with no meaning.
+describeBudget();

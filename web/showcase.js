@@ -38,9 +38,7 @@ var Module = {
     $('runtimeStatus').textContent = 'Engine unavailable';
     $('runtimeStatus').classList.add('error');
     $('runtimeError').hidden = false;
-    $('stateText').textContent = 'OFFLINE';
-    $('statePill').classList.remove('strain');
-    $('statePill').classList.add('idle');
+    Instrument.setState('OFFLINE', 'idle');   // the dashboard owns that stamp
     $('toolHint').textContent = 'Reload the page over HTTP. index.js and index.wasm must sit beside index.html.';
   },
   framePtr: () => Module._frame_buffer(),

@@ -36,6 +36,26 @@ Emscripten glue expects `Module` to be a real global. Each references the others
 inside functions that run after load, so the order is a reading order rather than a
 dependency chain — but keep it.
 
+#### One owner per read-out
+
+State is not shared so much as delegated, and each of these is the only writer of what it
+owns:
+
+| Owner | Holds | Never does |
+|---|---|---|
+| `core.js` | DOM handles, the camera transform that both painting and picking use, the three body colours (`COLORS`), the frame budget (`BUDGET_MS`, `GAUGE_FULL_MS`), formatting | State or behaviour |
+| `scenes.js` | The ten scenes' copy and framing, in engine order | Touch the DOM |
+| `render.js` | The canvas: frame-buffer decode and painting | Write a read-out, or read one back |
+| `instrument.js` | Every measured read-out — tiles, gauge, composition, stage split, plot axes, metre ruler — plus the status stamp through `setState` and the tuning controls' mirror of the solver | Drive input or navigation |
+| `showcase.js` | The runtime object, scene navigation, pointer/keyboard input, tool state, the frame loop, and transport chrome (`syncChrome`) | Compute a measurement |
+| `shell.html` | Structure and pre-boot placeholders; its seven stage rows are the one list of stages; the budget caption and the gauge's numeric label are filled from `core.js` | State a number that the code also states |
+
+Two duplicates are deliberate. `COLORS` in `core.js` holds the canvas hues — staged a step
+darker than the legend — while `showcase.css` owns the legend tokens; `a11y.cjs` asserts the
+two stay the same hue, so they are a paired decision rather than drift. And the shell's
+scene-0 copy repeats `scenes.js` because it is what a browser shows before the engine boots;
+`showScene(0)` overwrites it with the same strings.
+
 No CDN or runtime backend is required. The favicon is an inline SVG data URI, so the page
 issues no third-party requests. Use HTTP, not `file://`. The directory may contain local
 logs: copy only these nine files for delivery, never the SDK, dependencies or complete

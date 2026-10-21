@@ -37,10 +37,10 @@
     <aside class="scene-nav"><div class="panel-head"><span class="sheet-num">01</span><div class="section-label">EXPERIMENTS<span>10</span></div></div><nav id="scenes" aria-label="Experiments"></nav><p class="nav-foot">Each experiment restates its own solver configuration.</p></aside>
     <section class="experiment" aria-labelledby="sceneTitle">
       <header class="experiment-header">
-        <div class="experiment-title"><p class="eyebrow" id="sceneCategory">CONTACT &amp; CONSTRAINT</p><h2 id="sceneTitle">Newton’s cradle</h2></div>
+        <div class="experiment-title"><p class="eyebrow" id="sceneCategory">01 / CONTACT &amp; CONSTRAINT</p><h2 id="sceneTitle">Newton’s cradle</h2></div>
         <span id="runtimeStatus" class="status" role="status">Loading engine…</span>
       </header>
-      <p id="note" class="scene-description">Five suspended balls. One release. Watch the impulse travel.</p>
+      <p id="note" class="scene-description">Five suspended balls. One release. Watch the impulse travel through the chain.</p>
       <div class="toolbar" aria-label="Simulation controls"><div class="control-group"><button id="pause">Pause</button><button id="step" title="Advance one fixed 1/60 second step">Step<kbd>N</kbd></button><button id="restart">Restart</button></div><div class="control-group"><button id="slow">¼ speed</button><button id="debug">Contacts<kbd>D</kbd></button></div></div>
       <div class="stage"><div class="stage-view"><canvas id="canvas" width="1280" height="720" aria-label="Interactive physics experiment: drag a body or choose a spawn tool"></canvas><span class="stage-label" id="cameraLabel">WORLD VIEW / METRES</span><span class="stage-scan" aria-hidden="true"></span><span class="stage-wipe" id="stageWipe" aria-hidden="true"></span></div><div class="stage-scale" aria-hidden="true"><i class="scale-ticks"></i><i class="scale-bars"></i><span class="scale-edge lo" id="scaleLo">—</span><span class="scale-step" id="scaleStep">—</span><span class="scale-edge hi" id="scaleHi">—</span></div></div>
       <div class="tools"><span id="toolHint" role="status">Drag a body to disturb the system.</span><div class="control-group" aria-label="Spawn tools"><button id="spawnBox">+ Box</button><button id="spawnCircle">+ Circle</button></div></div>
@@ -59,8 +59,8 @@
         <div class="meters">
           <div class="meter">
             <div class="meter-head"><span>SINGLE-STEP BUDGET</span><span id="budgetVerdict" class="verdict">—</span></div>
-            <div class="budget" id="budgetBar" role="img" aria-label="Physics step cost against a 16.67 ms frame budget"><i class="budget-fill" id="budgetFill"></i><b class="budget-mark"></b></div>
-            <div class="meter-scale" aria-hidden="true"><span>0</span><span>33.3 MS · FULL BAR</span></div>
+            <div class="budget" id="budgetBar" role="img" aria-label="Physics step cost against the 60 Hz frame budget"><i class="budget-fill" id="budgetFill"></i><b class="budget-mark"></b></div>
+            <div class="meter-scale" aria-hidden="true"><span>0</span><span id="scaleFull">—</span></div>
             <p class="meter-foot">Measured step against a 60 Hz frame (<b id="budgetValue">—</b>). Simulation only, excludes rendering and the browser's own frame work.</p>
           </div>
           <div class="meter">

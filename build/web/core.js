@@ -6,7 +6,10 @@
 // whole frontend stays classic scripts rather than ES modules.
 //
 // The camera transform is the single source of truth shared by the renderer and
-// by pointer picking, so a click always lands where the body was drawn.
+// by pointer picking, so a click always lands where the body was drawn. The body
+// palette and the frame budget are defined here once for the same reason: the
+// renderer paints COLORS and the instrument derives every budget number from
+// BUDGET_MS / GAUGE_FULL_MS instead of repeating a literal in a label.
 // ============================================================================
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -28,8 +31,13 @@ let cadence = 'starting';
 // The CCD bullet is drawn from the rust ramp instead (see render.js).
 const COLORS = ['#55838c', '#dba45c', '#7d7aa8'];
 
-// The step budget the dashboard gauges against: one 60 Hz frame.
+// The step budget the dashboard gauges against: one 60 Hz frame, and the span its
+// bar covers. Everything numeric that names the budget — the gauge's full-bar
+// scale, the history plot's reference line, its axis label, the static caption
+// under the bar and the gauge's accessible name — is derived from these two
+// numbers, so no label can disagree with the bar it labels.
 const BUDGET_MS = 1000 / 60;
+const GAUGE_FULL_MS = BUDGET_MS * 2;
 
 function viewportScale() { return canvas.width / camera.width; }
 function toScreen(x, y) {
