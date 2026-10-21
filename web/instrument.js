@@ -3,16 +3,23 @@
 //
 // Reads the engine's additive stats buffer (see buildStats() in web/main.cpp)
 // once per rendered frame and projects it onto the panel: counts, a step-cost
-// gauge against the 60 Hz budget, a wake/sleep composition bar, a rolling cost
-// history, and the opt-in seven-stage breakdown.
+// gauge against the 60 Hz budget, a wake/sleep composition bar, a calibrated
+// cost history, the opt-in seven-stage breakdown, and the metre ruler under the
+// stage.
 //
 // Everything animated here is driven by a measured value. There is no decorative
 // motion: the budget bar is literally the step cost, the composition bar is
-// literally how many bodies are awake, and the history plot is the last frames'
-// exponential moving averages.
+// literally how many bodies are awake, the history plot is the last frames'
+// exponential moving averages, and the ruler's tick spacing is the same camera
+// scale the pointer inverse maps through.
 // ============================================================================
 const STAGES = ['broadphase', 'narrowphase', 'islands', 'solve', 'integrate', 'ccd', 'bookkeeping'];
 const SPARK_MAX = 120;
+// Inset of the plotted series inside the canvas bitmap, in bitmap pixels. The
+// axis labels are placed from the same two numbers, so a gridline and its label
+// cannot drift apart.
+const SPARK_PAD_TOP = 9;
+const SPARK_PAD_BOTTOM = 4;
 
 const PHASE_NOTE_OFF =
   'Stage attribution is read from the engine\'s own per-frame timings and is off by default, '
@@ -32,11 +39,26 @@ document.querySelectorAll('#phaseList .phase').forEach(row => {
 
 const spark = $('spark');
 const sparkCtx = spark.getContext('2d');
+const stepTile = document.querySelector('[data-tile="step"]');
+const axisBudget = $('axisBudget');
+const axisZero = $('axisZero');
+
+// A measured value with its unit set subordinate to the number: "30.03 ms".
+function valueWithUnit(text) {
+  const [num, unit] = text.split(' ');
+  return '<span class="num">' + num + '</span>' + (unit ? '<i>' + unit + '</i>' : '');
+}
+
+// Signed world coordinate for the ruler's edge labels, using a real minus sign.
+function metres(x) {
+  return (x < 0 ? '\u2212' : '') + Math.abs(x).toFixed(2) + ' m';
+}
 
 const Instrument = {
   history: [],
   last: null,
   frames: 0,
+  scaleKey: '',
 
   read() {
     const s = Module._stats_buffer() >> 2;
@@ -70,6 +92,7 @@ const Instrument = {
     }
     if (resetHistory) { this.history.length = 0; this.frames = 0; }
     this.drawSpark();
+    this.drawScale();
   },
 
   update(frame) {
@@ -84,7 +107,9 @@ const Instrument = {
     $('asleepCount').textContent = frame.asleep.toLocaleString();
     $('staticCount').textContent = frame.staticCount.toLocaleString();
     $('contactCount').textContent = frame.contacts.toLocaleString();
-    $('stepCost').textContent = fmtMs(stepMs);
+    // The one tile whose value carries a unit: the measured step.
+    $('stepCost').innerHTML = valueWithUnit(fmtMs(stepMs));
+    stepTile.classList.toggle('over', over);
 
     // Gauge: a full bar is two 60 Hz budgets, so the 60 Hz mark sits at halfway.
     $('budgetFill').style.width = (Math.min(stepMs / (BUDGET_MS * 2), 1) * 100).toFixed(1) + '%';
@@ -117,6 +142,7 @@ const Instrument = {
     $('stepCount').textContent = steps.toLocaleString();
 
     this.updatePhases(st, stepMs);
+    this.drawScale();
     this.pushHistory(stepMs);
     if (this.frames++ % 2 === 0) this.drawSpark();
   },
@@ -127,7 +153,7 @@ const Instrument = {
     for (let i = 0; i < 7; i++) sum += st[i];
     STAGES.forEach((name, i) => {
       const row = phaseRows[name];
-      row.val.textContent = fmtMs(st[i]);
+      row.val.innerHTML = valueWithUnit(fmtMs(st[i]));
       row.bar.style.width = sum > 0 ? (st[i] / sum * 100).toFixed(1) + '%' : '0%';
     });
     const total = $('stageTotal');
@@ -141,6 +167,26 @@ const Instrument = {
       total.classList.remove('good', 'over');
       $('phaseNote').textContent = PHASE_NOTE_BELOW;
     }
+  },
+
+  // The ruler under the stage. One tick is one metre-scale step, chosen so the
+  // ticks never collapse into a haze, and the two edge labels are the world
+  // coordinates the visible view actually spans. Written only when it changes:
+  // the car's follow camera moves this every frame.
+  drawScale() {
+    const perMetre = canvas.clientWidth / camera.width;   // CSS px per metre
+    const steps = [0.5, 1, 2, 5, 10, 20, 50, 100];
+    let stepM = steps[steps.length - 1];
+    for (const s of steps) if (perMetre * s >= 22) { stepM = s; break; }
+    const lo = camera.x - camera.width / 2;
+    const hi = camera.x + camera.width / 2;
+    const key = stepM + '|' + metres(lo) + '|' + metres(hi) + '|' + perMetre.toFixed(1);
+    if (key === this.scaleKey) return;
+    this.scaleKey = key;
+    document.documentElement.style.setProperty('--metre', (perMetre * stepM).toFixed(2) + 'px');
+    $('scaleStep').textContent = 'TICKS ' + stepM + ' M';
+    $('scaleLo').textContent = metres(lo);
+    $('scaleHi').textContent = metres(hi);
   },
 
   pushHistory(ms) {
@@ -160,34 +206,42 @@ const Instrument = {
     // reference line stays in the plot instead of being pushed off the top.
     const peak = Math.max(BUDGET_MS, sampleMax);
 
-    const y = v => h - 5 - (Math.min(v, peak) / peak) * (h - 13);
+    const plotBottom = h - SPARK_PAD_BOTTOM;
+    const y = v => plotBottom - (Math.min(v, peak) / peak) * (plotBottom - SPARK_PAD_TOP);
     const step = w / (SPARK_MAX - 1);
     const x = i => (SPARK_MAX - n + i) * step;   // newest sample pinned to the right
 
-    // The 60 Hz budget is the reference line, so the plot answers "are we inside
-    // a frame?" rather than just "what happened".
-    sparkCtx.strokeStyle = '#46564a'; sparkCtx.lineWidth = 1; sparkCtx.setLineDash([4, 5]);
+    // Axis: a zero rule, then the 60 Hz budget as the reference line, so the plot
+    // answers "are we inside a frame?" rather than just "what happened".
+    sparkCtx.strokeStyle = 'rgba(236,229,213,.07)'; sparkCtx.lineWidth = 1;
+    sparkCtx.beginPath(); sparkCtx.moveTo(0, y(0)); sparkCtx.lineTo(w, y(0)); sparkCtx.stroke();
+    sparkCtx.strokeStyle = 'rgba(157,154,216,.55)'; sparkCtx.setLineDash([4, 5]);
     sparkCtx.beginPath(); sparkCtx.moveTo(0, y(BUDGET_MS)); sparkCtx.lineTo(w, y(BUDGET_MS)); sparkCtx.stroke();
     sparkCtx.setLineDash([]);
+    // Axis labels sit in the gutter beside the canvas; place them on the rules.
+    axisBudget.textContent = BUDGET_MS.toFixed(1);
+    axisBudget.style.top = (y(BUDGET_MS) / h * 100).toFixed(2) + '%';
+    axisZero.style.top = (y(0) / h * 100).toFixed(2) + '%';
 
     if (n > 1) {
       sparkCtx.beginPath();
-      sparkCtx.moveTo(x(0), h);
+      sparkCtx.moveTo(x(0), plotBottom);
       for (let i = 0; i < n; i++) sparkCtx.lineTo(x(i), y(this.history[i]));
-      sparkCtx.lineTo(x(n - 1), h);
+      sparkCtx.lineTo(x(n - 1), plotBottom);
       sparkCtx.closePath();
-      const grad = sparkCtx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, 'rgba(193,220,151,.30)');
-      grad.addColorStop(1, 'rgba(193,220,151,0)');
+      const grad = sparkCtx.createLinearGradient(0, SPARK_PAD_TOP, 0, plotBottom);
+      grad.addColorStop(0, 'rgba(226,162,78,.20)');
+      grad.addColorStop(1, 'rgba(226,162,78,0)');
       sparkCtx.fillStyle = grad; sparkCtx.fill();
 
       sparkCtx.lineWidth = 1.5;
       for (let i = 1; i < n; i++) {
         const a = this.history[i - 1], b = this.history[i];
-        sparkCtx.strokeStyle = (a > BUDGET_MS || b > BUDGET_MS) ? '#c07d63' : '#c1dc97';
+        sparkCtx.strokeStyle = (a > BUDGET_MS || b > BUDGET_MS) ? '#c2603f' : '#e2a24e';
         sparkCtx.beginPath(); sparkCtx.moveTo(x(i - 1), y(a)); sparkCtx.lineTo(x(i), y(b)); sparkCtx.stroke();
       }
-      sparkCtx.fillStyle = this.history[n - 1] > BUDGET_MS ? '#c07d63' : '#c1dc97';
+      const lastOver = this.history[n - 1] > BUDGET_MS;
+      sparkCtx.fillStyle = lastOver ? '#c2603f' : '#f2cb8e';
       sparkCtx.beginPath(); sparkCtx.arc(x(n - 1), y(this.history[n - 1]), 2.4, 0, Math.PI * 2); sparkCtx.fill();
     }
     $('sparkCaption').textContent = n < 2

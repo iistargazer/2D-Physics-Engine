@@ -28,6 +28,10 @@
 !/build/*.svg
 # textual receipts inside the documented receipt directories
 !/build/browser-check/*.log
+# The one script under build/ that is a regression guard rather than a disposable
+# harness: the palette's contrast and colour-redundancy check. A token edit has to
+# fail it in a fresh clone, so it is versioned (docs/VISUAL.md §7).
+!/build/browser-check/a11y.cjs
 !/build/mission-audit/*.log
 !/build/mission-audit/*.exit
 !/build/prepared/*.csv

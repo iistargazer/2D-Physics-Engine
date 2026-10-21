@@ -1,6 +1,6 @@
 # Showcasing phys2d
 
-The presentation path is the browser **Mechanics lab**, with ten existing C++ scene factories, per-scene explanations, live measurements and camera framing. Native SFML and headless evidence are alternatives. [Project guide](../PHYSICS_ENGINE_GUIDE.md) owns status; [BENCHMARKS](BENCHMARKS.md) owns numbers; [FROM_SCRATCH](FROM_SCRATCH.md) explains implementation.
+The presentation path is the browser **Mechanics lab**, with ten existing C++ scene factories, per-scene explanations, live measurements and camera framing. Native SFML and headless evidence are alternatives. [Project guide](../PHYSICS_ENGINE_GUIDE.md) owns status; [BENCHMARKS](BENCHMARKS.md) owns numbers; [FROM_SCRATCH](FROM_SCRATCH.md) explains implementation; [VISUAL](VISUAL.md) owns the palette, type scale and layout of the page itself.
 
 ## 1. Browser: build and serve
 
@@ -74,11 +74,21 @@ Below the stage, the page reports what the engine is doing rather than what the 
   60 Hz mark at halfway and a `WITHIN`/`OVER 60 HZ BUDGET` verdict. Two budgets fill the bar.
 - **Composition.** Static / asleep / awake as real proportions of the body count.
 - **Step-cost history.** The last 120 frames of the step EMA with the budget drawn as a
-  reference line; samples above budget are drawn in the over-budget colour.
+  labelled reference line and the axis ruled from the same pad constants the series uses, so
+  the 60 Hz rule and its label cannot drift apart; samples above budget are drawn in the
+  over-budget colour.
 - **Stage breakdown (opt-in).** The seven `World::timings` buckets — broadphase,
   narrowphase, islands, solve, integrate, CCD, bookkeeping — as shares of the measured
   total, with the Σ shown against the step EMA. They sum toward the step rather than
   hiding work in one bucket, so the reconciliation is itself a spot check.
+
+The metre ruler under the stage is not decoration: `instrument.js` derives the on-screen size
+of one metre from the same camera width the pointer inverse maps through, snaps the tick step so
+ticks never collapse into a haze, and labels the two edges with the world coordinates the view
+spans. Section numbers run 01–05, telemetry is a ruled ledger whose six tiles each carry a 2px
+left rule in their own hue, and the breakdown and tuning panels share a row above 1180px.
+[VISUAL](VISUAL.md) states the palette and the hue rule (warm = awake, lavender = asleep, teal
+= static, rust = over budget and nothing else).
 
 The tuning controls are seeded from whatever the current scene factory configured and
 re-read from the engine after every change, scene switch and restart: they mirror the
@@ -94,7 +104,7 @@ breakdown is itself measurable work, which is why it is off by default.
 
 ### Feedback and recovery
 
-Measurements are body count, awake/asleep/static dynamics, **contact points**, physics-step EMA, simulated step count and frame-pump cadence. They exclude rendering and do not measure achieved frame rate. Contact-point count is not the native title's manifold count. Colors distinguish static, awake and asleep bodies; the CCD bullet is coral. Cradle/pendulum lines are presentation guides, not added constraints.
+Measurements are body count, awake/asleep/static dynamics, **contact points**, physics-step EMA, simulated step count and frame-pump cadence. They exclude rendering and do not measure achieved frame rate. Contact-point count is not the native title's manifold count. Colours distinguish static (teal), awake (amber) and asleep (lavender) bodies, the same three hues the telemetry tiles use — the stage varies their lightness, never their hue, and [VISUAL](VISUAL.md) records the ratio each one has to clear; the CCD bullet is rust, the one deliberate exception to the "rust means over budget" rule. Cradle/pendulum lines are presentation guides, not added constraints.
 
 A first-run strip explains the three things worth doing — pick an experiment, drag or arm a
 spawn tool, pause and step — and its dismissal is remembered in `localStorage`. If the
@@ -117,7 +127,7 @@ wipe) is suppressed under `prefers-reduced-motion: reduce`.
 
 Final local Chromium receipts: [221 interaction checks](../build/browser-check/polish-results.log), [50 framing checks](../build/browser-check/framing-results.log) and [87 dashboard checks](../build/browser-check/dashboard-results.log). The first two are unchanged by the presentation pass; the third covers the telemetry tiles against the frame buffer, the gauge arithmetic and its over-budget state, the opt-in stage breakdown and its reconciliation with the step, the tuning controls' effect on the measured stage split, the wake-on-sleep-off behaviour, first-run guidance persistence, recovery-state visibility and reduced-motion suppression.
 
-Real mouse/keyboard flows cover all scenes, spawning/grabbing, center/edge mapping, resize during drag, nondefault bitmap, restart and selected states; widths 390–1500 and DPR 1/2. Dashboard screenshots at 1440/1024/390 were inspected. These are local scripts/receipts under disposable `build/`, not a portable CI test suite. Physical touch and other engines remain untested; OS blur coverage partly uses a dispatched blur event. No rendered performance acceptance was measured.
+Real mouse/keyboard flows cover all scenes, spawning/grabbing, center/edge mapping, resize during drag, nondefault bitmap, restart and selected states; widths 390–1500 and DPR 1/2. The same three suites were re-run unchanged after the presentation rebuild — 221 + 87 + 50 assertions, exit 0, empty page-error lists ([check](../build/browser-check/presentation-check.log), [dashboard](../build/browser-check/presentation-dashboard.log), [framing](../build/browser-check/presentation-framing.log)) — and [VISUAL](VISUAL.md) records the before/after screenshots at 1440/1024/390 with the panel crops. A fourth check measures the palette itself and is versioned rather than disposable: [a11y.cjs](../build/browser-check/a11y.cjs) reads 83 text/graphic pairs off the live page against WCAG AA, finds 0 below (from 18 of 79 pairs before the repair), and adds nine assertions that no state is encoded only as colour — [receipt](../build/browser-check/a11y-after.log), [the before state](../build/browser-check/a11y-before.log). These are local scripts/receipts under `build/`, not a portable CI test suite, and appearance is asserted only where it can be measured: contrast and colour redundancy. Physical touch and other engines remain untested; OS blur coverage partly uses a dispatched blur event. No rendered performance acceptance was measured.
 
 Driven steps are taken through the engine's own pause + single-step path, and the suite
 asserts the simulated step counter equals the number of driver iterations, so a throttled

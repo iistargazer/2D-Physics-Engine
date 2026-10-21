@@ -1,268 +1,410 @@
 /* ============================================================================
    phys2d / The mechanics lab — presentation layer.
 
-   Design intent: an instrument panel inside a field notebook. Hairline rules,
-   wide-tracked small caps, tabular figures, and a restrained palette where the
-   engine's own lime carries state and a warm rust carries overload.
+   Design intent: a measured instrument plate inside a field notebook, lit like
+   a Maxfield Parrish twilight. The palette is deliberately four hues and no
+   more, taken from the reference paintings: an ultramarine ground, parchment
+   ink, warm amber light and a lavender and teal pair for dormant and static
+   state. Rust is reserved for one meaning only — a step over the frame budget.
 
-   Texture (grain, vignette, a slow sweep) is layered at very low opacity so it
-   reads as printed material without competing with the measurements. All of it
-   is decorative and all of it is suppressed under prefers-reduced-motion.
+     warm  (amber)    energy: awake bodies, solver cost, the live state
+     cool  (lavender) dormant: sleeping bodies, the CCD prototype path
+     cold  (teal)     static geometry
+     ink   (parchment) totals and reading text
+     rust             over budget, and nothing else
+
+   Every surface is squared, every separator is a hairline, and every label is
+   wide-tracked mono with the number or unit subordinate to the value. Texture
+   (grain, vignette, a slow sweep) is layered at low opacity so it reads as
+   printed material rather than competing with the measurements; all of it is
+   decorative and all of it is suppressed under prefers-reduced-motion.
    ========================================================================= */
 :root{
   color-scheme:dark;
-  --bg:#0f1412; --bg-deep:#0a0e0c; --panel:#141a17; --panel-2:#18201c;
-  --line:#2b352f; --line-soft:#212a25;
-  --text:#e7ece5; --muted:#94a79a; --faint:#6b7d70;
-  --accent:#c1dc97; --accent-dim:#8fae67; --warm:#deb98c; --rust:#c07d63; --paper:#e3d9c2;
-  --mono:ui-monospace,"SFMono-Regular","SF Mono",Menlo,Consolas,"Courier New",monospace;
-  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --spring:cubic-bezier(.34,1.56,.64,1);
+
+  /* surfaces — ultramarine twilight, never a neutral black */
+  --void:#070810; --ground:#0c0e17; --panel:#101322; --panel-2:#151930;
+  --inset:#090b14; --nav:#0e1120;
+  --stage-top:#161c33; --stage-mid:#0e1224; --stage-low:#090b16;
+
+  /* rules. --rule-strong is the one that carries information (the metre ruler's
+     ticks and bars), so it is held above 3:1 on --inset; the two hairline tiers
+     are separators and deliberately stay faint.
+     See docs/VISUAL.md §7 and build/browser-check/a11y.cjs. */
+  --rule:#252b45; --rule-soft:#1a1f33; --rule-strong:#6a7095;
+
+  /* ink — parchment. WCAG AA is the floor for every tier that paints text, so
+     the hierarchy above it is spent on lightness rather than sunk below it:
+     ink 15:1, ink-2 9:1, ink-3 ~6:1, ink-4 ~5:1 on the lightest surface each is
+     used on. Faintness below the floor is reserved for non-text marks. */
+  --ink:#ece5d5; --ink-2:#b3b0c8; --ink-3:#9a97ac; --ink-4:#8f8ca0;
+
+  /* the hue system */
+  --amber:#e2a24e; --amber-2:#b57d31; --amber-3:#f2cb8e;
+  --lav:#9d9ad8; --lav-2:#6f6da8; --teal:#5f9ea6;
+  --rust:#c2603f; --rust-2:#e08b62;
+
+  /* type */
+  --mono:ui-monospace,"Cascadia Mono","SFMono-Regular","SF Mono",Menlo,Consolas,"Courier New",monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --serif:Palatino,"Palatino Linotype","Iowan Old Style","Book Antiqua",Georgia,"Times New Roman",serif;
+
+  /* the metre ruler under the stage is re-scaled by instrument.js */
+  --metre:48px;
   --ease:cubic-bezier(.22,.61,.36,1);
+  --spring:cubic-bezier(.34,1.4,.64,1);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 var(--sans);overflow-x:hidden}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.62 var(--sans);overflow-x:hidden}
+/* Two soft sky lights: warm from the upper right, cool from the upper left. */
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(1200px 600px at 18% -8%,rgba(193,220,151,.055),transparent 62%),
-             radial-gradient(900px 520px at 96% 4%,rgba(222,185,140,.045),transparent 60%)}
+  background:radial-gradient(1100px 620px at 78% -12%,rgba(226,162,78,.075),transparent 62%),
+             radial-gradient(900px 540px at 6% -8%,rgba(157,154,216,.07),transparent 64%)}
 body>*{position:relative;z-index:1}
 
 /* --- texture ------------------------------------------------------------ */
 .grain,.vignette{position:fixed;inset:0;pointer-events:none;z-index:60}
-.grain{opacity:.05;mix-blend-mode:soft-light;
+.grain{opacity:.042;mix-blend-mode:soft-light;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-.vignette{opacity:.5;background:radial-gradient(ellipse 120% 90% at 50% 34%,transparent 46%,rgba(0,0,0,.62) 100%)}
-.stage-scan{position:absolute;left:0;right:0;top:0;height:120px;pointer-events:none;opacity:.5;
-  background:linear-gradient(180deg,transparent,rgba(193,220,151,.05) 55%,transparent);
-  animation:sweep 9s linear infinite}
-@keyframes sweep{from{transform:translateY(-140px)}to{transform:translateY(760px)}}
+.vignette{opacity:.62;background:radial-gradient(ellipse 126% 96% at 50% 30%,transparent 44%,rgba(3,3,9,.72) 100%)}
+.stage-scan{position:absolute;left:0;right:0;top:0;height:150px;pointer-events:none;opacity:.34;
+  background:linear-gradient(180deg,transparent,rgba(242,203,142,.055) 58%,transparent);
+  animation:sweep 13s linear infinite}
+@keyframes sweep{from{transform:translateY(-160px)}to{transform:translateY(900px)}}
 /* Scene changes acknowledge themselves with one state-driven wipe of the stage. */
 .stage-wipe{position:absolute;inset:0;pointer-events:none;opacity:0;
-  background:linear-gradient(90deg,transparent,rgba(193,220,151,.20),transparent)}
-.stage-wipe.on{animation:wipe .46s var(--ease) 1}
+  background:linear-gradient(90deg,transparent,rgba(242,203,142,.22),transparent)}
+.stage-wipe.on{animation:wipe .5s var(--ease) 1}
 @keyframes wipe{from{opacity:0;transform:translateX(-100%)}30%{opacity:1}to{opacity:0;transform:translateX(100%)}}
-@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.72)}}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* --- shell -------------------------------------------------------------- */
-.masthead,main,footer{max-width:1440px;margin:auto;padding-left:40px;padding-right:40px}
-.masthead{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:100px;border-bottom:1px solid var(--line)}
-.wordmark{text-decoration:none;display:flex;flex-direction:column;line-height:1.15}
-.wordmark{font-size:29px;font-weight:750;letter-spacing:-1px}
-.wordmark span{color:var(--accent)}
-.wordmark small{display:block;font:10px/1.4 var(--mono);letter-spacing:.24em;color:var(--muted);margin-top:3px}
-.build-label,.eyebrow,.section-label,.engineering article>span{font:11px/1.6 var(--mono);letter-spacing:.16em;color:var(--muted)}
-.build-label{display:inline-flex;align-items:center;gap:8px}
-.build-label i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulseDot 2.4s ease-in-out infinite}
-.intro{padding:46px 0 34px;display:grid;grid-template-columns:1fr 1fr;align-items:end;gap:0 48px}
-.intro .eyebrow{grid-column:1/-1;margin:0 0 18px}
-h1{font-size:clamp(36px,4.4vw,66px);line-height:1.03;letter-spacing:-.035em;font-weight:560;margin:0}
-h1 em{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-style:italic;color:var(--accent)}
-.lede{max-width:420px;font-size:17px;color:var(--muted);margin:0 0 4px}
+.masthead,main,footer{max-width:1480px;margin:auto;padding-left:40px;padding-right:40px}
+.masthead{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:18px;min-height:104px;
+  border-bottom:1px solid var(--rule)}
+.wordmark{display:flex;align-items:center;gap:11px;text-decoration:none;flex-wrap:wrap}
+.wordmark .mark{width:23px;height:23px;flex:0 0 auto;display:block}
+.wordmark-text{font-family:var(--serif);font-size:27px;line-height:1;letter-spacing:-.02em;white-space:nowrap}
+.wordmark-text span{color:var(--amber)}
+.wordmark small{flex:1 0 100%;font:9px/1.5 var(--mono);letter-spacing:.3em;color:var(--ink-3);margin-top:5px}
+.build-label,.eyebrow,.section-label,.art-tag{font:10px/1.6 var(--mono);letter-spacing:.2em;color:var(--ink-3)}
+.build-label{display:inline-flex;align-items:center;gap:9px;justify-self:end;text-transform:uppercase;color:var(--ink-3)}
+.build-label i{display:inline-block;width:5px;height:5px;background:var(--amber);animation:pulseDot 2.8s ease-in-out infinite}
+.intro{padding:54px 0 40px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:end;gap:0 56px}
+.intro .eyebrow{grid-column:1/-1;margin:0 0 22px;color:var(--ink-4)}
+h1{font-family:var(--serif);font-size:clamp(38px,5.4vw,74px);line-height:.98;letter-spacing:-.028em;font-weight:400;margin:0;color:var(--ink)}
+h1 em{font-style:italic;color:var(--amber)}
+.lede{max-width:440px;font-size:16px;line-height:1.7;color:var(--ink-2);margin:0 0 6px;justify-self:end}
 
 /* --- first run ---------------------------------------------------------- */
-.first-run{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 26px;padding:13px 16px;
-  background:linear-gradient(180deg,rgba(193,220,151,.06),rgba(193,220,151,.02));
-  border:1px solid var(--line);border-left:2px solid var(--accent);border-radius:4px;
-  font-size:13px;color:#ccd8cd;transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.first-run{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 30px;padding:14px 18px;
+  background:linear-gradient(90deg,rgba(226,162,78,.09),rgba(226,162,78,.015));
+  border:1px solid var(--rule);border-left:2px solid var(--amber);border-radius:2px;
+  font-size:13px;color:var(--ink-2);transition:opacity .3s var(--ease),transform .3s var(--ease)}
 .first-run.hidden{display:none}
-.first-run-tag{font:10px/1 var(--mono);letter-spacing:.2em;color:var(--accent);border:1px solid rgba(193,220,151,.35);border-radius:2px;padding:5px 7px}
-.first-run-steps{flex:1 1 320px;min-width:0;line-height:1.7;overflow-wrap:anywhere}
-.runtime-error{margin:0 0 16px;padding:14px 16px;border:1px solid #5a3a2f;border-left:2px solid var(--rust);border-radius:4px;background:rgba(192,125,99,.07)}
-.runtime-error[hidden]{display:none}
-.runtime-error strong{display:block;font:11px var(--mono);letter-spacing:.16em;color:var(--rust);margin-bottom:7px}
-.runtime-error p{margin:0 0 12px;font-size:12px;line-height:1.7;color:#d3c7c0}
-.runtime-error code{font:11px var(--mono);color:var(--paper);background:#0c110f;border:1px solid var(--line);border-radius:2px;padding:1px 4px}
-.first-run-steps b{color:var(--text);font-weight:600}
-.ghost{background:transparent;border:1px solid var(--line);border-radius:3px;padding:6px 11px;font-size:12px;transition:border-color .2s var(--ease),color .2s var(--ease)}
-.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.first-run-tag{font:9px/1 var(--mono);letter-spacing:.22em;color:var(--amber-3);border:1px solid var(--amber-2);border-radius:2px;padding:6px 8px}
+.first-run-steps{flex:1 1 320px;min-width:0;line-height:1.75;overflow-wrap:anywhere}
+.first-run-steps b{color:var(--ink);font-weight:600}
+.ghost{background:transparent;border:1px solid var(--rule);border-radius:2px;padding:8px 12px;font:10px var(--mono);
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);
+  transition:border-color .2s var(--ease),color .2s var(--ease)}
+.ghost:hover{border-color:var(--amber-2);color:var(--amber-3)}
 
-/* --- workspace ---------------------------------------------------------- */
-.workspace{display:grid;grid-template-columns:245px minmax(0,1fr);border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
-.scene-nav{padding:24px 16px;background:#121a16;border-right:1px solid var(--line);min-width:0}
-.section-label{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-.section-label span{color:var(--accent);font-size:10px;letter-spacing:.14em}
-.nav-hint{font-size:12px;color:var(--muted);margin:8px 0 22px}
-#scenes{display:grid;gap:3px}
-#scenes button{display:flex;align-items:center;text-align:left;gap:13px;width:100%;background:none;border:1px solid transparent;
-  border-radius:4px;padding:11px 9px;line-height:1.35;font-size:13px;transition:background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease),transform .16s var(--spring)}
-#scenes button .number{font:11px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
-#scenes button.on{background:#243126;border-color:#4e5f45;color:var(--accent)}
-#scenes button.on .number{color:var(--accent)}
-#scenes button:hover{background:#1d2721}
-#scenes button:active{transform:translateX(2px)}
-.experiment{padding:26px;background:var(--panel);min-width:0}
-.experiment-header{display:flex;justify-content:space-between;align-items:center;gap:16px}
-.eyebrow{margin:0 0 7px}
-h2{font-size:27px;line-height:1.2;letter-spacing:-.02em;margin:0;font-weight:560;overflow-wrap:anywhere}
-.status{font:11px var(--mono);letter-spacing:.12em;white-space:nowrap;border:1px solid var(--line);padding:6px 9px;border-radius:3px;color:var(--accent);transition:color .25s var(--ease),border-color .25s var(--ease)}
-.status.error{color:var(--rust);border-color:#5a3a2f}
-.scene-description{color:var(--muted);margin:14px 0 22px;max-width:760px;min-height:48px}
-.toolbar,.control-group,.tools{display:flex;align-items:center;gap:6px}
-.toolbar{justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px}
+/* --- runtime error ------------------------------------------------------ */
+.runtime-error{margin:0 0 18px;padding:16px 18px;border:1px solid var(--rule);border-left:2px solid var(--rust);border-radius:2px;background:rgba(194,96,63,.07)}
+.runtime-error[hidden]{display:none}
+.runtime-error strong{display:block;font:10px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--rust-2);margin-bottom:8px}
+.runtime-error p{margin:0 0 14px;font-size:12px;line-height:1.75;color:var(--ink-2)}
+.runtime-error code{font:11px var(--mono);color:var(--amber-3);background:var(--inset);border:1px solid var(--rule-soft);border-radius:2px;padding:2px 5px}
+
+/* --- workspace plate ---------------------------------------------------- */
+.workspace{position:relative;display:grid;grid-template-columns:236px minmax(0,1fr);border:1px solid var(--rule);background:var(--panel);overflow:hidden}
+/* registration marks, as on a technical drawing: two opposite corners only */
+.workspace::before,.workspace::after{content:"";position:absolute;width:11px;height:11px;pointer-events:none;z-index:3}
+.workspace::before{left:0;top:0;border-left:1px solid var(--amber-2);border-top:1px solid var(--amber-2)}
+.workspace::after{right:0;bottom:0;border-right:1px solid var(--amber-2);border-bottom:1px solid var(--amber-2)}
+.scene-nav{padding:22px 16px 24px;background:var(--nav);border-right:1px solid var(--rule);min-width:0;display:flex;flex-direction:column}
+.nav-foot{margin:18px 0 0;font:9px/1.7 var(--mono);letter-spacing:.1em;color:var(--ink-4);max-width:190px}
+#scenes{display:grid;gap:1px;margin-top:18px}
+#scenes button{display:grid;grid-template-columns:22px minmax(0,1fr);align-items:baseline;text-align:left;gap:9px;width:100%;
+  background:none;border:0;border-left:2px solid transparent;padding:9px 8px;line-height:1.4;
+  font:12px/1.4 var(--mono);letter-spacing:.01em;color:var(--ink-2);
+  transition:background .18s var(--ease),border-color .18s var(--ease),color .18s var(--ease)}
+#scenes button .number{font:10px var(--mono);letter-spacing:.08em;color:var(--ink-4);font-variant-numeric:tabular-nums}
+#scenes button:hover{background:rgba(157,154,216,.06);color:var(--ink)}
+#scenes button.on{background:rgba(226,162,78,.09);border-left-color:var(--amber);color:var(--ink)}
+#scenes button.on .number{color:var(--amber)}
+#scenes button:active{transform:translateX(1px)}
+
+.experiment{padding:26px 28px 30px;background:var(--panel);min-width:0}
+.experiment-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:16px}
+.experiment-title{min-width:0}
+.eyebrow{margin:0 0 8px;text-transform:uppercase}
+h2{font-family:var(--serif);font-size:clamp(24px,2.5vw,33px);line-height:1.14;letter-spacing:-.015em;font-weight:400;margin:0;overflow-wrap:anywhere}
+.status{font:9px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;border:1px solid var(--rule);padding:7px 9px;border-radius:2px;color:var(--ink-2);transition:color .25s var(--ease),border-color .25s var(--ease)}
+.status.error{color:var(--rust-2);border-color:var(--rust)}
+.scene-description{color:var(--ink-2);margin:16px 0 22px;max-width:780px;min-height:46px;font-size:14px}
+
+/* the number gutter shared by the nav rail and every panel head */
+.sheet-num{font:10px/1.6 var(--mono);letter-spacing:.14em;color:var(--amber-2);font-variant-numeric:tabular-nums}
+.panel-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:baseline;gap:13px;
+  padding-bottom:10px;border-bottom:1px solid var(--rule);margin-bottom:16px}
+.section-label{display:flex;align-items:baseline;gap:12px;min-width:0;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;overflow:hidden}
+.section-label span{color:var(--ink-4);font-size:9px}
+.scene-nav .panel-head{margin-bottom:0;padding-bottom:12px}
+
+/* --- toolbar and stage -------------------------------------------------- */
+.toolbar,.control-group,.tools{display:flex;align-items:center;gap:7px}
+.toolbar{justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 button:disabled{opacity:.4;cursor:wait}
-button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 a{color:inherit}
-.control-group button{background:#1c2620;border:1px solid #3b4a3f;border-radius:4px;padding:7px 11px;font-size:12px;min-height:36px;
-  transition:border-color .2s var(--ease),background .2s var(--ease),color .2s var(--ease),transform .14s var(--spring)}
-.control-group button:hover{border-color:var(--accent)}
-.control-group button:active{transform:translateY(1px) scale(.985)}
-.control-group button.on{color:#14200f;background:var(--accent);border-color:var(--accent)}
-kbd{font:10px var(--mono);opacity:.65;margin-left:4px;border:0;background:none}
-.stage{position:relative;background:#0d1310;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.control-group button{background:var(--panel-2);border:1px solid var(--rule);border-radius:2px;padding:9px 12px;min-height:36px;
+  font:10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);
+  transition:border-color .18s var(--ease),background .18s var(--ease),color .18s var(--ease),transform .12s var(--ease)}
+.control-group button:hover{border-color:var(--amber-2);color:var(--ink)}
+.control-group button:active{transform:translateY(1px)}
+.control-group button.on{color:#191004;background:var(--amber);border-color:var(--amber)}
+/* A key is a key wherever it appears: in a button caption or in running prose. */
+kbd{display:inline-block;font:9px var(--mono);letter-spacing:.08em;color:inherit;opacity:.78;margin-left:6px;
+  border:1px solid rgba(236,229,213,.22);border-radius:2px;padding:1px 4px;background:rgba(0,0,0,.18)}
+
+.stage{border:1px solid var(--rule);border-radius:2px;overflow:hidden;background:var(--inset)}
+/* The world view is a twilight sky above a darker floor, so amber bodies read
+   against depth rather than against a flat black rectangle. */
+.stage-view{position:relative;background:
+  radial-gradient(124% 82% at 50% 0%,rgba(226,162,78,.055),transparent 56%),
+  linear-gradient(180deg,var(--stage-top) 0%,var(--stage-mid) 60%,var(--stage-low) 100%)}
 canvas{display:block;width:100%;aspect-ratio:16/9;touch-action:none}
-#spark{aspect-ratio:auto;height:76px;background:#0c110f;border:1px solid var(--line);border-radius:3px;margin-top:4px}
-.stage-label{position:absolute;top:12px;left:14px;font:9px var(--mono);color:#7c9381;letter-spacing:.16em;pointer-events:none}
-.tools{justify-content:space-between;padding:12px 0;gap:12px}
-.tools>span{font-size:12px;color:var(--muted);min-width:0}
+.stage-label{position:absolute;top:11px;left:14px;font:9px var(--mono);color:var(--ink-3);letter-spacing:.2em;pointer-events:none}
+/* Metre ruler: ticks are spaced by --metre, which instrument.js derives from the
+   same camera width the pointer inverse uses, so the scale is the real one. */
+.stage-scale{position:relative;height:24px;border-top:1px solid var(--rule-soft);background:var(--inset)}
+.scale-ticks{position:absolute;left:0;right:0;top:0;height:4px;
+  background-image:repeating-linear-gradient(90deg,var(--rule-strong) 0 1px,transparent 1px var(--metre))}
+/* every fifth step is a full-height bar, so the span is countable at a glance */
+.scale-bars{position:absolute;left:0;right:0;top:0;height:8px;
+  background-image:repeating-linear-gradient(90deg,var(--rule-strong) 0 1px,transparent 1px calc(var(--metre) * 5))}
+.scale-edge,.scale-step{position:absolute;top:8px;font:9px/1 var(--mono);letter-spacing:.1em;color:var(--ink-4);font-variant-numeric:tabular-nums}
+.scale-edge.lo{left:0}
+.scale-edge.hi{right:0}
+.scale-step{left:50%;transform:translateX(-50%);color:var(--ink-4)}
+
+.tools{justify-content:space-between;padding:13px 0;gap:12px}
+.tools>span{font:11px/1.6 var(--mono);letter-spacing:.06em;color:var(--ink-3);min-width:0}
 canvas[data-tool]{cursor:crosshair}
 
-/* --- telemetry dashboard ------------------------------------------------ */
-.dashboard,.phases,.tuning{margin-top:26px;border-top:1px solid var(--line);padding-top:18px}
-.panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-.state-pill{display:inline-flex;align-items:center;gap:8px;font:10px var(--mono);letter-spacing:.16em;color:var(--accent);
-  border:1px solid var(--line);border-radius:999px;padding:5px 11px;transition:color .25s var(--ease),border-color .25s var(--ease)}
-.state-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulseDot 2.4s ease-in-out infinite}
-.state-pill.idle{color:var(--muted)}
-.state-pill.idle .dot{animation:none;opacity:.6}
-.state-pill.strain{color:var(--rust);border-color:#5a3a2f}
-.verdict{font:10px var(--mono);letter-spacing:.14em;color:var(--muted);white-space:nowrap;transition:color .25s var(--ease)}
-.verdict.over{color:var(--rust)}
-.verdict.good{color:var(--accent)}
-.telemetry{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden}
-.telemetry>div{padding:13px 14px;background:var(--panel-2);min-width:0}
-.telemetry span{display:block;font:9px var(--mono);letter-spacing:.16em;color:var(--muted);margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.telemetry strong{font:21px/1.1 var(--mono);font-weight:400;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:18px}
+/* --- telemetry ledger --------------------------------------------------- */
+.dashboard{margin-top:30px;border-top:1px solid var(--rule);padding-top:20px}
+.state-pill{display:inline-flex;align-items:center;gap:8px;font:9px/1 var(--mono);letter-spacing:.2em;color:var(--amber-3);
+  border:1px solid var(--amber-2);border-radius:2px;padding:7px 10px;background:rgba(226,162,78,.08);
+  transition:color .25s var(--ease),border-color .25s var(--ease),background .25s var(--ease)}
+.state-pill .dot{width:5px;height:5px;background:currentColor;animation:pulseDot 2.8s ease-in-out infinite}
+.state-pill.idle{color:var(--ink-3);border-color:var(--rule);background:transparent}
+.state-pill.idle .dot{animation:none;opacity:.55}
+.state-pill.strain{color:var(--rust-2);border-color:var(--rust);background:rgba(194,96,63,.1)}
+.verdict{font:9px/1.6 var(--mono);letter-spacing:.18em;color:var(--ink-3);white-space:nowrap;transition:color .25s var(--ease)}
+.verdict.over{color:var(--rust-2)}
+.verdict.good{color:var(--amber-3)}
+
+/* Six tiles sharing hairline rules. The 2px left rule carries each tile's own
+   hue, so the ledger can be read as a colour key without a legend. */
+.telemetry{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;background:var(--rule-soft);
+  border:1px solid var(--rule);border-radius:2px;overflow:hidden}
+.telemetry>div{padding:14px 15px 16px;min-width:0;background:linear-gradient(180deg,#171b2e,#12162a);
+  box-shadow:inset 2px 0 0 var(--rule-strong);transition:box-shadow .3s var(--ease)}
+.telemetry>div>span{display:block;font:9px var(--mono);letter-spacing:.18em;color:var(--ink-3);margin-bottom:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.telemetry strong{font:24px/1.06 var(--mono);font-weight:400;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--ink)}
+/* A unit is a label, not part of the number: subordinate, tracked, never bold. */
+.num{font-weight:400;font-style:normal}
+.telemetry strong i{font-style:normal;font-size:11px;letter-spacing:.14em;color:var(--ink-4);margin-left:5px}
+/* These must out-specify the `.telemetry>div` base rule above, which is why each
+   selector repeats the parent class and the element type. */
+.telemetry>div[data-tile="bodies"]{box-shadow:inset 2px 0 0 var(--ink-2)}
+.telemetry>div[data-tile="awake"]{box-shadow:inset 2px 0 0 var(--amber)}
+.telemetry>div[data-tile="asleep"]{box-shadow:inset 2px 0 0 var(--lav)}
+.telemetry>div[data-tile="static"]{box-shadow:inset 2px 0 0 var(--teal)}
+.telemetry>div[data-tile="contacts"]{box-shadow:inset 2px 0 0 var(--amber-2)}
+.telemetry>div[data-tile="step"]{box-shadow:inset 2px 0 0 var(--amber)}
+.telemetry>div[data-tile="step"].over{box-shadow:inset 2px 0 0 var(--rust)}
+
+.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px 30px;margin-top:24px}
 .meter{min-width:0}
-.meter-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font:10px var(--mono);letter-spacing:.14em;color:var(--muted);margin-bottom:8px}
+.meter-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font:9px var(--mono);
+  letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px}
 /* overflow stays visible so the "60 HZ" caption on the threshold mark is not
    clipped; the fill carries its own radius instead of relying on clipping. */
-.budget{position:relative;height:11px;margin-top:16px;background:#0b100e;border:1px solid var(--line);border-radius:3px}
-.budget-fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:2px;max-width:100%;
-  background:linear-gradient(90deg,var(--accent-dim),var(--accent));
+.budget{position:relative;height:12px;margin-top:18px;background:var(--inset);border:1px solid var(--rule);border-radius:1px}
+.budget-fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:1px;max-width:100%;
+  background:linear-gradient(90deg,var(--amber-2),var(--amber));box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
   transition:width .3s var(--ease),background .35s var(--ease)}
-.budget.over .budget-fill{background:linear-gradient(90deg,#9c5b41,var(--rust))}
-.budget-mark{position:absolute;left:50%;top:-1px;bottom:-1px;width:1px;background:rgba(231,236,229,.45)}
-.budget-mark::after{content:"60 HZ";position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:3px;font:8px var(--mono);letter-spacing:.12em;color:var(--faint);white-space:nowrap}
-.composition{display:flex;height:11px;border:1px solid var(--line);border-radius:3px;overflow:hidden;background:#0b100e}
+/* Over budget is a pattern, not just a hue: the hatch reads at a glance and keeps
+   rust meaning exactly one thing on this page. */
+.budget.over .budget-fill{background:
+  repeating-linear-gradient(45deg,rgba(10,10,16,.22) 0 3px,transparent 3px 6px),
+  linear-gradient(90deg,#7f3421,var(--rust))}
+.budget-mark{position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--ink-3)}
+.budget-mark::after{content:"60 HZ";position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:4px;font:8px var(--mono);letter-spacing:.16em;color:var(--ink-4);white-space:nowrap}
+.composition{display:flex;height:12px;border:1px solid var(--rule);border-radius:1px;overflow:hidden;background:var(--inset);margin-top:18px}
 .composition .seg{display:block;width:0;transition:width .3s var(--ease),opacity .3s var(--ease)}
-.seg-awake{background:linear-gradient(90deg,var(--accent-dim),var(--accent))}
-.seg-asleep{background:#3f5347}
-.seg-static{background:#26332b}
+.seg-awake{background:linear-gradient(90deg,#8c6224,var(--amber));box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
+.seg-asleep{background:linear-gradient(90deg,var(--lav-2),var(--lav));box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.seg-static{background:var(--teal)}
 .seg.empty{opacity:.25}
-.meter-foot{font-size:10px;line-height:1.7;color:var(--muted);margin:9px 0 0}
-.meter-foot b{color:#c4d0c6;font-weight:500;font-variant-numeric:tabular-nums}
-.key{display:inline-block;width:8px;height:8px;border-radius:1px;margin:0 5px 0 8px;vertical-align:baseline}
-.key.awake{background:var(--accent)}
-.key.asleep{background:#3f5347}
-.key.static{background:#26332b}
-.key:first-of-type{margin-left:0}
-.spark-row{margin-top:18px}
-.spark-head{margin-bottom:8px}
+.meter-scale{display:flex;justify-content:space-between;gap:10px;margin-top:7px;font:8px/1.4 var(--mono);
+  letter-spacing:.16em;color:var(--ink-4)}
+.meter-scale.keys{justify-content:flex-start;gap:18px;color:var(--ink-3)}
+.key{display:inline-block;width:7px;height:7px;margin-right:6px;vertical-align:baseline}
+.key.awake{background:var(--amber)}
+.key.asleep{background:var(--lav)}
+.key.static{background:var(--teal)}
+.meter-foot{font:11px/1.75 var(--mono);letter-spacing:.02em;color:var(--ink-3);margin:10px 0 0}
+.meter-foot b{color:var(--ink-2);font-weight:400;font-variant-numeric:tabular-nums}
 
-/* --- phase breakdown ---------------------------------------------------- */
-.phase-list{display:grid;gap:5px}
-.phase{display:grid;grid-template-columns:110px minmax(0,1fr) 68px;align-items:center;gap:12px;
+/* --- step-cost plot ----------------------------------------------------- */
+.spark-row{margin-top:26px}
+.spark-head{margin-bottom:9px}
+.spark-body{display:grid;grid-template-columns:38px minmax(0,1fr);gap:9px;align-items:stretch}
+.spark-axis{position:relative;font:9px/1 var(--mono);color:var(--ink-4);font-variant-numeric:tabular-nums}
+.spark-axis span{position:absolute;right:0;transform:translateY(-50%);white-space:nowrap}
+.spark-axis .axis-unit{top:0;transform:none;color:var(--ink-4);letter-spacing:.14em}
+#spark{display:block;width:100%;height:120px;background:var(--inset);border:1px solid var(--rule);border-radius:2px}
+
+/* --- instrument deck: breakdown beside tuning at wide widths ------------ */
+.deck{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+.phases{margin-top:30px;border-top:1px solid var(--rule);padding-top:20px;min-width:0}
+.tuning{margin-top:30px;border-top:1px solid var(--rule);padding-top:20px;min-width:0}
+/* Phase rows: label, a hairline meter, the engine's own figure. */
+.phase-list{display:grid;gap:6px}
+.phase{display:grid;grid-template-columns:106px minmax(0,1fr) 74px;align-items:center;gap:12px;
   transition:opacity .3s var(--ease)}
-.phase span{font:9px var(--mono);letter-spacing:.14em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.phase em{font:11px var(--mono);font-style:normal;text-align:right;color:#c4d0c6;font-variant-numeric:tabular-nums}
-.phase-bar{display:block;height:7px;background:#0c110f;border:1px solid var(--line-soft);border-radius:2px;overflow:hidden}
-.phase-bar b{display:block;height:100%;width:0;background:linear-gradient(90deg,#4c6242,var(--accent-dim));transition:width .3s var(--ease)}
-.phase[data-stage="ccd"] .phase-bar b{background:linear-gradient(90deg,#8a5a44,var(--rust))}
-.phases.off .phase-list{opacity:.3;filter:saturate(.4)}
+.phase>span{font:9px var(--mono);letter-spacing:.14em;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phase em{font:11px var(--mono);font-style:normal;text-align:right;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.phase em i{font-style:normal;font-size:8px;letter-spacing:.12em;color:var(--ink-4);margin-left:4px}
+.phase-bar{display:block;height:6px;background:var(--inset);border:1px solid var(--rule-soft);border-radius:1px;overflow:hidden}
+.phase-bar b{display:block;height:100%;width:0;min-width:0;background:linear-gradient(90deg,#7a5520,var(--amber-2));transition:width .3s var(--ease)}
+/* CCD is the prototype path, so it is drawn from the dormant hue rather than the
+   alert one: rust means one thing only on this page. */
+.phase[data-stage="ccd"] .phase-bar b{background:linear-gradient(90deg,var(--lav-2),var(--lav))}
+.phases.off .phase-list{opacity:.32;filter:saturate(.35)}
 .phases.off .phase-bar b{width:0!important}
 
 /* --- tuning ------------------------------------------------------------- */
-.tune-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px}
+.tune-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px}
 .tune{min-width:0}
-.tune label{display:block;font:10px var(--mono);letter-spacing:.14em;color:var(--muted);margin-bottom:10px}
-.tune output{display:block;font:19px/1.2 var(--mono);font-variant-numeric:tabular-nums;margin-top:4px}
-.tune.toggles{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}
-.tune.toggles button{background:#1c2620;border:1px solid #3b4a3f;border-radius:4px;padding:8px 12px;font-size:12px;min-height:36px;
-  transition:border-color .2s var(--ease),background .2s var(--ease),color .2s var(--ease),transform .14s var(--spring)}
-.tune.toggles button:hover{border-color:var(--accent)}
-.tune.toggles button:active{transform:translateY(1px) scale(.985)}
-.tune.toggles button.on{color:#14200f;background:var(--accent);border-color:var(--accent)}
+.tune>label,.tune-label{display:block;font:9px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);margin:0 0 12px}
+.tune-value{display:flex;align-items:baseline;gap:8px;margin-bottom:14px}
+.tune output{font:27px/1 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--ink)}
+.unit{font:9px var(--mono);letter-spacing:.16em;color:var(--ink-4)}
+.tune-scale{display:flex;justify-content:space-between;margin-top:6px;font:8px/1 var(--mono);letter-spacing:.14em;color:var(--ink-4)}
+.tune.toggles{display:flex;flex-wrap:wrap;gap:7px;align-content:flex-start}
+.tune.toggles button{background:var(--panel-2);border:1px solid var(--rule);border-radius:2px;padding:9px 12px;min-height:36px;
+  font:10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);
+  transition:border-color .18s var(--ease),background .18s var(--ease),color .18s var(--ease),transform .12s var(--ease)}
+.tune.toggles button:hover{border-color:var(--amber-2);color:var(--ink)}
+.tune.toggles button:active{transform:translateY(1px)}
+.tune.toggles button.on{color:#191004;background:var(--amber);border-color:var(--amber)}
 .tune.toggles p{flex:1 1 100%}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;margin:0}
-input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--accent-dim),#2e3a33)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;margin-top:-5px;border-radius:50%;
-  background:var(--accent);border:2px solid #101613;transition:transform .16s var(--spring)}
-input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
-input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:#2e3a33}
-input[type=range]::-moz-range-thumb{width:12px;height:12px;border:2px solid #101613;border-radius:50%;background:var(--accent)}
+/* Sliders read as faders: an inset groove and a squared handle, not a knob. */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:0;
+  background:linear-gradient(90deg,var(--amber-2),var(--rule))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:19px;margin-top:-8px;border-radius:1px;
+  background:var(--amber);border:0;box-shadow:0 0 0 1px #0b0d18;transition:background .16s var(--ease)}
+input[type=range]::-webkit-slider-thumb:hover{background:var(--amber-3)}
+input[type=range]::-moz-range-track{height:3px;border-radius:0;background:var(--rule)}
+input[type=range]::-moz-range-thumb{width:11px;height:19px;border:0;border-radius:1px;background:var(--amber);box-shadow:0 0 0 1px #0b0d18}
 input[type=range]:disabled{opacity:.45;cursor:wait}
 
 /* --- notes -------------------------------------------------------------- */
-.timing-note{font-size:10px;line-height:1.7;color:var(--muted);margin:18px 0 22px}
-.field-notes{display:grid;grid-template-columns:1fr 1fr;gap:26px}
-.field-notes p:not(.eyebrow){font-size:13px;margin:0;color:#c4d0c6}
-.field-notes section:last-child{border-left:1px solid var(--line);padding-left:26px}
-.instructions{margin-top:25px;border-top:1px solid var(--line);padding-top:15px;font-size:12px;color:var(--muted)}
-summary{cursor:pointer;color:var(--text)}
-.legend{display:inline-block;width:8px;height:8px;margin:0 5px 0 10px;vertical-align:baseline}
-.legend.awake{background:var(--accent)}
-.legend.asleep{background:#3f5347}
-.legend.static{background:#26332b}
+.timing-note{font:10px/1.8 var(--mono);letter-spacing:.06em;color:var(--ink-3);margin:26px 0 24px;padding-top:14px;border-top:1px solid var(--rule-soft)}
+.field-notes{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.field-notes p:not(.eyebrow){font-size:13px;line-height:1.8;margin:0;color:var(--ink-2)}
+.field-notes section{padding-top:14px;border-top:1px solid var(--rule-soft)}
+.field-notes section:last-child{border-left:1px solid var(--rule-soft);padding-left:30px}
+.instructions{margin-top:28px;border-top:1px solid var(--rule);padding-top:16px;font:12px/1.8 var(--sans);color:var(--ink-3)}
+summary{cursor:pointer;color:var(--ink-2);font:10px var(--mono);letter-spacing:.18em;text-transform:uppercase;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+";display:inline-block;width:14px;color:var(--amber-2);font-size:12px}
+.instructions[open] summary::before{content:"–"}
+.instructions[open] summary{margin-bottom:12px}
+.legend{display:inline-block;width:7px;height:7px;margin:0 6px 0 10px;vertical-align:baseline}
+.legend.awake{background:var(--amber)}
+.legend.asleep{background:var(--lav)}
+.legend.static{background:var(--teal)}
 
 /* --- engineering -------------------------------------------------------- */
-.engineering{padding:52px 0}
-.engineering h2{font-family:Georgia,"Times New Roman",serif;font-size:34px;font-weight:400;letter-spacing:-.02em}
-.engineering-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;margin-top:26px}
-.engineering article{border-top:1px solid var(--line);padding-top:18px;min-width:0}
-.engineering h3{font-size:17px;font-weight:500;margin:12px 0 8px}
-.engineering p{color:var(--muted);font-size:13px;margin:0}
-footer{border-top:1px solid var(--line);padding-top:22px;padding-bottom:30px;display:flex;justify-content:space-between;gap:30px;font-size:11px;color:var(--muted)}
-footer p{margin:0;max-width:560px}
+.engineering{padding:64px 0}
+.engineering .eyebrow{color:var(--ink-4)}
+.engineering h2{font-family:var(--serif);font-size:clamp(28px,3.4vw,42px);letter-spacing:-.02em}
+.engineering-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:32px}
+.engineering article{border-top:1px solid var(--rule);padding-top:16px;min-width:0}
+.art-tag{display:block;color:var(--amber-2)}
+.engineering h3{font-family:var(--serif);font-size:19px;font-weight:400;letter-spacing:-.01em;margin:14px 0 10px;color:var(--ink)}
+.engineering p{color:var(--ink-2);font-size:13px;line-height:1.85;margin:0}
+footer{border-top:1px solid var(--rule);padding-top:24px;padding-bottom:34px;display:flex;justify-content:space-between;gap:34px;
+  font:10px/1.8 var(--mono);letter-spacing:.1em;color:var(--ink-3)}
+footer p{margin:0;max-width:600px}
 
 /* --- responsive --------------------------------------------------------- */
-@media(max-width:1000px){
-  .masthead,main,footer{padding-left:24px;padding-right:24px}
-  .workspace{grid-template-columns:196px minmax(0,1fr)}
-  .experiment{padding:20px}
-  .scene-nav{padding:20px 10px}
-  .build-label{font-size:9px}
-  .telemetry strong{font-size:18px}
-  .field-notes{gap:18px}
-  .field-notes section:last-child{padding-left:18px}
+@media(min-width:1180px){
+  .deck{grid-template-columns:minmax(0,1.04fr) minmax(0,1fr);gap:0 40px}
+  .tuning{border-top:0;margin-top:0;padding-top:0}
+  .tuning .panel-head{margin-top:61px;border-top:1px solid var(--rule);padding-top:20px}
 }
-@media(max-width:700px){
+@media(max-width:1080px){
+  .masthead,main,footer{padding-left:26px;padding-right:26px}
+  .workspace{grid-template-columns:198px minmax(0,1fr)}
+  .experiment{padding:22px}
+  .scene-nav{padding:18px 11px}
+  .telemetry{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .intro{gap:0 34px}
+}
+@media(max-width:760px){
   .masthead,main,footer{padding-left:16px;padding-right:16px}
-  .masthead{min-height:76px}
-  .build-label{max-width:130px;text-align:right;line-height:1.8;justify-content:flex-end;flex-wrap:wrap}
-  .intro{display:block;padding:32px 0}
-  .intro .eyebrow{font-size:9px}
-  .intro h1{letter-spacing:-.02em}
-  .lede{font-size:14px;margin-top:20px}
+  .masthead{grid-template-columns:1fr;gap:12px;min-height:0;padding-top:20px;padding-bottom:18px;align-items:start}
+  .build-label{justify-self:start}
+  .wordmark-text{font-size:24px}
+  .intro{display:block;padding:34px 0 28px}
+  .intro .eyebrow{font-size:9px;margin-bottom:16px}
+  h1{letter-spacing:-.02em}
+  .lede{font-size:14px;margin-top:22px;max-width:none}
   .workspace{display:block}
-  .scene-nav{border-right:0;border-bottom:1px solid var(--line);padding:14px}
-  .nav-hint{display:none}
-  #scenes{display:flex;overflow:auto;margin-top:10px;scrollbar-width:thin;gap:4px}
-  #scenes button{flex:0 0 auto;width:auto;padding:10px;font-size:12px}
-  .experiment{padding:16px}
-  .experiment-header{align-items:flex-start;flex-wrap:wrap}
-  h2{font-size:23px}
-  .status{font-size:9px;padding:5px}
-  .scene-description{font-size:13px;min-height:0;margin:12px 0 18px}
-  .toolbar{gap:8px}
-  .control-group button{padding:7px 9px}
-  .tools{align-items:flex-start}
-  .tools>span{font-size:11px;max-width:170px}
-  .telemetry{grid-template-columns:repeat(2,1fr)}
-  .telemetry strong{font-size:17px}
-  .meters{gap:16px}
-  .phase{grid-template-columns:92px minmax(0,1fr) 60px;gap:9px}
-  .phase span{font-size:8px;letter-spacing:.1em}
-  .field-notes{grid-template-columns:1fr;gap:18px}
+  .scene-nav{border-right:0;border-bottom:1px solid var(--rule);padding:16px 14px}
+  .nav-foot{display:none}
+  #scenes{display:flex;overflow:auto;margin-top:14px;gap:4px;scrollbar-width:thin}
+  #scenes button{flex:0 0 auto;width:auto;padding:9px 11px;border-left:0;border-bottom:2px solid transparent}
+  #scenes button.on{border-left:0;border-bottom-color:var(--amber)}
+  .experiment{padding:18px}
+  .experiment-header{grid-template-columns:minmax(0,1fr);row-gap:12px}
+  .status{justify-self:start}
+  /* Heads drop their trailing stamp onto a second row instead of squeezing it. */
+  .panel-head{grid-template-columns:auto minmax(0,1fr);row-gap:10px}
+  .panel-head>*:last-child{grid-column:2;justify-self:start}
+  .section-label{flex-wrap:wrap;white-space:normal;gap:8px}
+  h2{font-size:24px}
+  .scene-description{font-size:13px;min-height:0;margin:14px 0 18px}
+  .control-group button{padding:9px 10px}
+  kbd{margin-left:5px}
+  .tools{align-items:flex-start;flex-wrap:wrap}
+  .tools>span{flex:1 1 100%;font-size:10px}
+  .telemetry{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .telemetry strong{font-size:20px}
+  .meters{gap:22px}
+  .phase{grid-template-columns:88px minmax(0,1fr) 64px;gap:9px}
+  .phase span{font-size:8px;letter-spacing:.08em}
+  .deck{gap:0}
+  .field-notes{grid-template-columns:1fr;gap:20px}
   .field-notes section:last-child{border-left:0;padding-left:0}
-  .engineering{padding:34px 0}
-  .engineering-grid{grid-template-columns:1fr;gap:24px}
+  .engineering{padding:40px 0}
+  .engineering-grid{grid-template-columns:1fr;gap:26px}
   footer{display:block}
-  footer p{margin-top:10px}
-  .first-run{padding:12px}
+  footer p{margin-top:12px}
+  .first-run{padding:13px}
   .first-run-steps{font-size:12px}
+  .spark-body{grid-template-columns:32px minmax(0,1fr);gap:7px}
 }
 
 @media (prefers-reduced-motion: reduce){

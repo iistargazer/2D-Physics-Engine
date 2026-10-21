@@ -12,6 +12,11 @@
 // Buffer layout is documented in web/main.cpp.
 // ============================================================================
 
+// Dormant bodies are outlined with a dash as well as drawn in the dormant hue, so
+// "awake or asleep" is never carried by colour alone on this page.
+const DASH_ASLEEP = [3, 3];
+const DASH_NONE = [];
+
 function parseFrame(ptr, count) {
   const data = Module.HEAPF32.subarray(ptr >> 2, (ptr >> 2) + count);
   const frame = {
@@ -51,7 +56,7 @@ function paintFrame(frame, debug) {
   // Sparse metre grid gives scale without disguising the simulated geometry.
   const grid = scene === 7 ? 25 : (scene === 2 || scene === 4) ? 5 : 1;
   const [left, top] = toWorld(0, 0), [right, bottom] = toWorld(canvas.width, canvas.height);
-  ctx.strokeStyle = '#233128'; ctx.lineWidth = 1; ctx.beginPath();
+  ctx.strokeStyle = '#262f4d'; ctx.lineWidth = 1; ctx.beginPath();
   for (let x = Math.ceil(left / grid) * grid; x <= right; x += grid) {
     const p = toScreen(x, 0); ctx.moveTo(p[0], 0); ctx.lineTo(p[0], canvas.height);
   }
@@ -62,7 +67,10 @@ function paintFrame(frame, debug) {
 
   // Constraint guides: presentation only, not extra physics.
   if (scene === 0 || scene === 2) {
-    ctx.strokeStyle = '#7d9580'; ctx.lineWidth = 1.5; ctx.beginPath();
+        // A constraint guide is structure, not energy or state, so it is drawn from the
+    // ink ramp rather than from one of the four meaning hues — and bright enough to
+    // clear 3:1 on the sky behind it (docs/VISUAL.md §7).
+    ctx.strokeStyle = '#a6a3b8aa'; ctx.lineWidth = 1.5; ctx.beginPath();
     if (scene === 0) for (let b = 1; b < 6 && bodies[b]; b++) {
       const a = toScreen(b - 3, 3), p = toScreen(bodies[b].x, bodies[b].y);
       ctx.moveTo(...a); ctx.lineTo(...p);
@@ -74,24 +82,31 @@ function paintFrame(frame, debug) {
     ctx.stroke();
   }
 
+  let dashed = null;
   bodies.forEach((b, index) => {
-    ctx.fillStyle = scene === 8 && index === 1 ? '#efa58c' : COLORS[b.color];
-    ctx.strokeStyle = '#d7e6cb66'; ctx.lineWidth = 1;
+    // Set the dash only when it changes: allocating a dash array per body per
+    // frame would be pointless churn in a renderer this cheap.
+    const wantDash = b.color === 2;
+    if (wantDash !== dashed) { ctx.setLineDash(wantDash ? DASH_ASLEEP : DASH_NONE); dashed = wantDash; }
+    ctx.fillStyle = scene === 8 && index === 1 ? '#e08b62' : COLORS[b.color];
+    ctx.strokeStyle = '#efe6d580'; ctx.lineWidth = 1;
     ctx.beginPath();
     if (b.kind === 0) { const [x, y] = toScreen(b.x, b.y); ctx.arc(x, y, b.extra * s, 0, Math.PI * 2); }
     else { b.verts.forEach(([x, y], v) => { const p = toScreen(x, y); v ? ctx.lineTo(...p) : ctx.moveTo(...p); }); ctx.closePath(); }
     ctx.fill(); ctx.stroke();
   });
 
+  if (dashed) ctx.setLineDash(DASH_NONE);   // leave the context clean for the debug pass
+
   if (debug) {
     let i = frame.contactOffset;
     for (let c = 0; c < frame.contacts; c++) {
       const x = data[ptr + i++], y = data[ptr + i++], nx = data[ptr + i++], ny = data[ptr + i++], impulse = data[ptr + i++];
       const p = toScreen(x, y);
-      ctx.fillStyle = '#deb98c';
+      ctx.fillStyle = '#f2cb8e';
       ctx.beginPath(); ctx.arc(...p, Math.max(2, canvas.width / 640), 0, Math.PI * 2); ctx.fill();
       const len = (0.15 + Math.min(0.6, impulse * 0.03)) * s;
-      ctx.strokeStyle = '#efa58c';
+      ctx.strokeStyle = '#e08b62';
       ctx.beginPath(); ctx.moveTo(...p); ctx.lineTo(p[0] + nx * len, p[1] - ny * len); ctx.stroke();
     }
   }

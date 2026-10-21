@@ -35,7 +35,7 @@ These are real, current limits. Anything built on phys2d should be scoped around
 - **Continuous collision is still narrow.** Circles and nonspinning tilted polygons at 200/1k/10k m/s stop/rest before a 0.02 m static wall, with idle clamp/push-out/unconverged counters in the suite. A separate spinning-plate case stops translation while retaining 60 rad/s. [ccd.csv](../build/ccd.csv) reports zero event caps, not the other fallback counters. Swept impulses include translational Coulomb-clamped friction at the centre of mass, but omit off-center torque, joint re-solving and joint-connected exclusions; no swept-tree acceleration or validated jointed CCD scene exists.
 - **Long chains stretch.** The 100-plank bridge reaches a 0.010674 m maximum anchor error after joint projection, but the unprojected 100-link benchmark still reports a 3.021928 maximum error at 40 sweeps. Tall kinematic chains are not ship quality.
 - **No sanitizer execution.** ASan/UBSan are configured in [CI](../.github/workflows/ci.yml) but have not run: the local toolchain lacks `-lasan` / `-lubsan`, so debug-mode results must not be read as a sanitizer pass.
-- **The browser build is a demo, not a product.** `bash web/build.sh` produces five required assets: `index.html`, `index.js`, `index.wasm`, `showcase.css` and `showcase.js`. Responsive desktop/narrow layout and pointer controls have Chromium evidence; physical touch/other engines and permanent hosting remain unverified. Serve over HTTP, not `file://`. See [SHOWCASE](SHOWCASE.md) for setup and controls.
+- **The browser build is a demo, not a product.** `bash web/build.sh` produces nine required files that must stay together: `index.html`, `index.js`, `index.wasm`, `showcase.css` and the five frontend scripts. Responsive desktop/narrow layout and pointer controls have Chromium evidence; physical touch/other engines and permanent hosting remain unverified. Serve over HTTP, not `file://`. See [SHOWCASE](SHOWCASE.md) for setup and controls.
 
 ## 3. Applications
 
@@ -44,6 +44,15 @@ These are real, current limits. Anything built on phys2d should be scoped around
 A 2D rigid-body engine underpins platformers, top-down shooters, puzzle games, pinball, and sandbox titles: character capsules against terrain, crates and barrels that topple, ropes and swinging hazards, vehicles that roll over uneven ground, and debris that must settle rather than jitter. phys2d covers the core loop for this: SAT-based contact generation, sequential impulses with friction, warm-started stacking, and a dynamic AABB tree that keeps pair generation cheap as object counts grow.
 
 What works today: the tested small/medium scene factories, resting-stack bounds and fixed 1/60 s stepping. That step size is not a measured rendered 60 Hz guarantee. What production would need: collision layers for projectiles and triggers, one-way platforms, a stable body handle system so content can be spawned and destroyed at any time, and serialization for level and save data.
+
+Embedding it is two lines, because the core is headers and nothing else:
+
+```bash
+g++ -std=c++20 -O2 -I. examples/embed/game.cpp -o build/embed_game
+./build/embed_game   # steps=240 crates=12 contacts=13 y=[-0.500, 2.477] player_x=1.842
+```
+
+[`examples/embed/game.cpp`](../examples/embed/game.cpp) is the smallest honest integration: the game owns the clock, the input and the spawning, and the engine owns only the simulation. It builds with one include path on this host (g++ 13.2.0, no warnings under `-Wall -Wextra -Wpedantic`), links nothing, and prints that line byte for byte on a single thread. A renderer would read `world.bodies` after each step, which is exactly what the browser build does. What a shipped game still needs is the list above — stable handles and serialization first, because content streaming is what breaks the index-based joint and manifold model.
 
 ### Sandbox and creative tools
 

@@ -19,9 +19,14 @@ let runtimeReady = false, spawnMode = null, dragPointer = null, currentScene = 0
 let camera = {x: 0, y: 2.2, width: 9};
 let cadence = 'starting';
 
-// Body colors by engine state: 0 static, 1 awake, 2 asleep. The CCD bullet is
-// drawn from the rust ramp instead (see render.js).
-const COLORS = ['#526158', '#c1dc97', '#65786b'];
+// Body colors by engine state: 0 static, 1 awake, 2 asleep. These are the same
+// three hues the dashboard's telemetry ledger uses — teal for frozen geometry,
+// amber for energy, lavender for a dormant island — so the picture and the panel
+// name the same state with the same hue, staged a little darker here so a field
+// of thousands of bodies does not glare. A static body also has to clear 3:1 on
+// the lightest sky the stage paints, which is what sets its value.
+// The CCD bullet is drawn from the rust ramp instead (see render.js).
+const COLORS = ['#55838c', '#dba45c', '#7d7aa8'];
 
 // The step budget the dashboard gauges against: one 60 Hz frame.
 const BUDGET_MS = 1000 / 60;

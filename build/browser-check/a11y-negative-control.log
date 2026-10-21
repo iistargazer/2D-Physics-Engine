@@ -1,0 +1,102 @@
+reported, not asserted (2): stage grid (decorative), hairline rule (decorative)
+
+pair                               px  weight   ratio  need  result
+.lede                             16     400    9.13   4.5  PASS
+.scene-description                14     400    8.75   4.5  PASS
+field note prose                  13     400    8.75   4.5  PASS
+.meter-foot                       11     400     6.5   4.5  PASS
+footer span                       10     400    6.78   4.5  PASS
+engineering prose                 13     400    9.13   4.5  PASS
+engineering heading h3            19     400   15.34   4.5  PASS
+intro eyebrow                     10     400    2.91   4.5  FAIL
+build label                       10     400    6.78   4.5  PASS
+nav-foot                           9     400    2.83   4.5  FAIL
+nav item                          12     400     8.9   4.5  PASS
+nav item number                   10     400    2.83   4.5  FAIL
+nav selected (label)              12     400   13.11   4.5  PASS
+nav selected (number)             10     400    7.45   4.5  PASS
+section label                     10     400    8.75   4.5  PASS
+section label meta                 9     400    2.78   4.5  FAIL
+sheet number                      10     400    5.22   4.5  PASS
+tune label                         9     400     6.5   4.5  PASS
+status stamp                       9     400    8.75   4.5  PASS
+field note eyebrow                10     400     6.5   4.5  PASS
+tile label                         9     400       6   4.5  PASS
+tile value                        24     400   13.58     3  PASS
+tile unit                         11     400    2.57   4.5  FAIL
+meter head                         9     400     6.5   4.5  PASS
+verdict                            9     400     6.5   4.5  PASS
+meter scale                        8     400    2.78   4.5  FAIL
+phase label                        9     400     6.5   4.5  PASS
+phase value                       11     400    8.75   4.5  PASS
+phase unit                         8     400    2.78   4.5  FAIL
+tune unit                          9     400    2.78   4.5  FAIL
+tune scale                         8     400    2.78   4.5  FAIL
+spark axis                         9     400    2.96   4.5  FAIL
+ruler edge                         9     400    2.96   4.5  FAIL
+stage camera label                 9     400    5.93   4.5  PASS
+toolbar button                    10     400    8.21   4.5  PASS
+tuning toggle                     10     400    8.21   4.5  PASS
+tuning value                      27     400    14.7     3  PASS
+ghost button                      10     400    8.06   4.5  PASS
+kbd hint                           9     400    5.49   4.5  PASS
+pressed control (dark on amber)   10     400    8.51   4.5  PASS
+state stamp (live)                 9     400    10.7   4.5  PASS
+state stamp (idle)                undefined  undefined     6.5   4.5  PASS
+state stamp (strain)               9     400    6.44   4.5  PASS
+verdict good                       9     400   12.04   4.5  PASS
+verdict over                       9     400    7.06   4.5  PASS
+first-run tag                      9     400    11.1   4.5  PASS
+first-run prose                   13     400    8.06   4.5  PASS
+recovery heading                  10     400    6.64   4.5  PASS
+recovery prose                    12     400    8.23   4.5  PASS
+recovery code chip                11     400   12.82   4.5  PASS
+instructions summary              10     400    8.75   4.5  PASS
+instructions prose                12     400     6.5   4.5  PASS
+legend text (names the hues)       8     400     6.5   4.5  PASS
+article tag                       10     400    5.45   4.5  PASS
+pointer read-out                  11     400     6.5   4.5  PASS
+ruler step                         9     400    2.96   4.5  FAIL
+budget mark caption                8     400    2.78   4.5  FAIL
+awake legend swatch                8     400    8.36     3  PASS
+asleep legend swatch               8     400    7.07     3  PASS
+static legend swatch               8     400    6.09     3  PASS
+static composition segment        15     400    6.48     3  PASS
+awake composition segment         15     400    8.89     3  PASS
+budget fill                       15     400    8.89     3  PASS
+over-budget fill                  15     400    4.71     3  PASS
+budget 60 Hz mark                 15     700    6.92     3  PASS
+phase bar fill                    15     700    5.56     3  PASS
+ccd bar fill                      15     700    4.14     3  PASS
+tile state rule (awake)           15     400    7.72     3  PASS
+tile state rule (asleep)          15     400    6.53     3  PASS
+tile state rule (static)          15     400    5.62     3  PASS
+tile state rule (step)            15     400    7.72     3  PASS
+tile state rule (bodies)          15     400    8.08     3  PASS
+tile state rule (contacts)        15     400    4.82     3  PASS
+asleep composition segment        15     400    7.52     3  PASS
+ruler ticks                       15     400    4.08     3  PASS
+ruler fifth-step bars             15     400    4.08     3  PASS
+stage body: static                 0       0    4.02     3  PASS
+stage body: awake                  0       0    7.59     3  PASS
+stage body: asleep                 0       0    4.18     3  PASS
+stage contact dot                  0       0   10.98     3  PASS
+stage impulse line                 0       0    6.44     3  PASS
+stage constraint guide             0       0     3.8     3  PASS
+stage body outline                 0       0    4.37     3  PASS
+stage grid (decorative)            0       0    1.41     3  note
+hairline rule (decorative)        15     400    1.38     3  note
+slider thumb vs track (declared)   0       0     6.3     3  PASS
+
+PASS every composition hue is named in text next to its bar
+PASS every telemetry tile is labelled in text, so its state rule is never the only cue
+PASS every stage row is labelled in text, including the one drawn in the dormant hue
+PASS the over-budget fill carries a hatch as well as a hue
+FAIL the renderer outlines dormant bodies with a dash, so awake/asleep is not hue-only in the stage
+PASS the scale ruler is marked decorative; the view span is stated in text by the camera label
+PASS the stage draws static/awake/dormant bodies in the hues the legend names, staged darker: #55838c #dba45c #7d7aa8 vs #5f9ea6 #e2a24e #9d9ad8
+PASS the live state stamp prints its state as a word, not as a hue alone: "ACTIVE"
+PASS no browser runtime errors: []
+
+checked 83 pairs, 13 below AA, 1 assertion(s) failed
+13 pairs below AA, 1 assertion(s) failed
