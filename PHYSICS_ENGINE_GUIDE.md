@@ -17,7 +17,7 @@ Native build commands live in [README](README.md); browser/desktop operation liv
 | Optimized native suite | [final_tests.log](build/final_tests.log): 143 `ok:` assertions, zero failures; existing native executable rerun during audit also passed | Cross-platform or sanitizer safety; assertion count is not a feature-completeness score |
 | CMake | [build log](build/cmake_build.log): eight default targets at that revision; current tree is fourteen targets, warnings-clean. [CTest receipt](build/temporal/ctest-active.log): five registered tests (`engine`, `ccd_allocations`, `world_storage`, `temporal`, `rows`) all passed | Remote CI or portable packaging; a target count is not a coverage score |
 | Checked-container debug | [final_debug_tests.log](build/final_debug_tests.log): older 76-assertion revision passed | Current 142-assertion debug coverage; ASan/UBSan |
-| Browser build | Emscripten 6.0.12 produced HTML, JS, WASM, CSS and showcase JS; syntax/build and copied-asset checks passed | Clean-machine setup, deployed origin or every browser engine |
+| Browser build | Emscripten 6.0.12 produced HTML, JS, WASM, CSS and showcase JS; syntax/build and copied-asset checks passed; the nine files are deployed and verified on a real origin ([DEPLOY](docs/DEPLOY.md)) | Clean-machine setup or every browser engine |
 | Browser interaction/layout | [221-check receipt](build/browser-check/polish-results.log) and [50-check framing receipt](build/browser-check/framing-results.log): Chromium, widths 390–1500, DPR 1/2, all scenes, spawn/drag inverse, resize, cleanup, restart, follow camera; screenshots inspected | Physical touch devices; complete OS focus-loss behavior (blur handler partly tested with a dispatched event); rendered frame performance |
 | Browser dashboard | [87-check receipt](build/browser-check/dashboard-results.log) and [driven measurement log](build/browser-check/dashboard-drive.log): telemetry tiles against the frame buffer, gauge arithmetic and over-budget state, opt-in stage split reconciled with the step, tuning controls changing the measured stage costs, wake-on-sleep-off, first-run persistence, recovery panel, reduced-motion suppression; dashboard screenshots at 1440/1024/390 inspected | One host and one browser; WASM excludes rendering; the stage split reads `BELOW CLOCK QUANTUM` on small scenes; the earlier driven-stress table did not reproduce (see SHOWCASE) |
 | Active 5k interaction | [active.csv](build/active.csv) / [active.err](build/active.err): simulation-only per-stage split, median/p95/p99/max, three trials, 5,000 awake vs asleep vs stirred, plus a driven browser stress run (0 awake/13.3 ms to 5,020 awake/44.7 ms under continuous input) | Host-load dependent (calibration drifted +69.9% mid-run); WASM and native figures are not interchangeable; render cost and rendered FPS unmeasured; single host, one compiler |
@@ -86,7 +86,7 @@ Documentation ownership:
 | SFML showcase | Ten scenes, rotation/translation interpolation, title-bar feedback and overlays implemented; full native interaction/packaging acceptance incomplete |
 | Performance | Benchmarks and phase timing exist; representative active-5k/rendered budget and profiling-led optimization remain unproven |
 | CCD | Limited prototype with per-body nets; specific thin-wall cases pass, not general off-center/jointed collision fidelity |
-| Browser showcase | Built and exercised, responsive presentation and per-scene framing; other engines/touch/deployment/clean-clone CI remain |
+| Browser showcase | Built and exercised, responsive presentation and per-scene framing, deployed and verified on a real origin; other engines/touch/clean-clone CI remain |
 
 ### CCD: precisely what is implemented
 
@@ -104,7 +104,7 @@ The [benchmark owner](docs/BENCHMARKS.md) records local costs and caveats. No ac
 
 ## 6. Remaining acceptance and GitHub preparation
 
-The expanded five-track mission is owned by [FEATURE_ACCEPTANCE](docs/FEATURE_ACCEPTANCE.md): equations, dependency order, per-track gates, allocation/layout contracts and frontend acceptance. These are requested outcomes, not completed features. The user has authorized eventual commit/push to https://github.com/iistargazer/2D-Physics-Engine after implementation and meaningful verification; this workspace still has no Git metadata. A fresh remote lookup returned no refs, so history/ownership reconciliation remains a release gate.
+The expanded five-track mission is owned by [FEATURE_ACCEPTANCE](docs/FEATURE_ACCEPTANCE.md): equations, dependency order, per-track gates, allocation/layout contracts and frontend acceptance. These are requested outcomes, not completed features. The work is committed and pushed to https://github.com/iistargazer/2D-Physics-Engine (`main`, commit `56d5997`, clean tree, remote ref verified by `ls-remote`) and the browser lab is published at <https://site-22be3251e8494dca85d1edd16f3d6ae8.freebuff.page> — see [DEPLOY](docs/DEPLOY.md) for what was verified on that origin.
 
 Available now: `timeOfImpact` borrows geometry and samples stack-only `SweepPose` values. [Prepared World stepping](docs/STORAGE.md) adds explicit body/joint/pair/contact/vertex capacity, allocation-free `tryStep` success/failure, flat contact/snapshot storage and owned broadphase/island/CCD scratch. Active-contact/joint and sleep/wake regressions cover whole steps, not just casts. Unprepared use still grows dynamically; the standalone CCD convenience overload still allocates scratch. Center-of-mass response and existing CCD limitations are unchanged.
 
@@ -116,16 +116,17 @@ Ordered unfinished outcomes, not a promise to implement every possible feature:
 - [ ] Render cost separated from simulation cost at 5k, and rendered-FPS evidence: the interactive showcase reports a step EMA that excludes rendering, and no rendered frame timing exists.
 - [ ] CCD acceptance for off-center/oblique and moving impacts, jointed scenes and connected-body filtering; retain honest prototype status until supported.
 - [ ] Browser checks in reproducible CI, other browser engines and physical touch; native mouse/overlay/portable bundle acceptance.
+- [x] Publish the browser build to a real origin. The nine assets are deployed through [deploy/](deploy) and verified running (HTML, CSS, JS and `application/wasm` all 200; the engine simulated hundreds of fixed steps with no console errors). Pages remains unconfigured.
 - [ ] Repository organization and packaging without breaking public includes/builds; safe runtime removal/handles if framework use is claimed.
 - [ ] Personal learning path is present; complete a clean-machine walkthrough and keep examples/links aligned as APIs change.
 
-GitHub preparation (no commit/publish performed; no `.git` currently present):
-- [ ] Destination is user-selected: https://github.com/iistargazer/2D-Physics-Engine. Verify remote ownership/history and visibility; obtain the license/provenance decision and add appropriate attribution/contribution expectations.
-- [ ] Add ignore rules for `build/`, SDK/dependencies, local client metadata, logs, probes and secrets. Curate receipts outside disposable output if they will be cited publicly.
+GitHub preparation (commit `56d5997` is published on `main`; the remaining items are unchecked):
+- [x] Destination is user-selected: https://github.com/iistargazer/2D-Physics-Engine. Remote `main` was confirmed to point at the pushed commit; the license/provenance decision and contribution expectations are still open.
+- [x] Add ignore rules for `build/`, SDK/dependencies, local client metadata, logs, probes and secrets. Curate receipts outside disposable output if they will be cited publicly — `.gitignore` keeps documented logs/CSVs/SVGs and the palette check while excluding toolchains, binaries and logs that nothing cites.
 - [ ] Validate a clean source checkout on supported hosts; pin Emscripten/build inputs and install compatible SFML only for its optional target.
-- [ ] Add browser build/test plus Pages artifact preparation. Upload only the five browser assets; verify repository-subpath URLs and JS/CSS/WASM content types. Current CI has **no Pages or browser job**.
-- [ ] Prepare release instructions/screenshots and portable native assets; do not copy the entire local `build/` tree.
-- [ ] Initialize/stage/commit/push/publish only with explicit authorization and ownership review. A configuration file or local preview is not a deployment.
+- [ ] Add browser build/test plus Pages artifact preparation. Nine assets, not five: `index.html`, `index.js`, `index.wasm`, `showcase.css` and the five frontend scripts. Deployment today copies exactly those nine ([deploy/make-dist.sh](deploy/make-dist.sh) fails on any other count) and was verified on a real origin; Pages subpath URLs are untested because CI still has **no Pages or browser job**.
+- [x] Prepare release instructions and screenshots: [DEPLOY](docs/DEPLOY.md) owns hosting, [VISUAL](docs/VISUAL.md) owns the before/after captures. Portable native assets remain unchecked; do not copy the entire local `build/` tree.
+- [x] Initialize/stage/commit/push/publish with explicit authorization and ownership review. A configuration file or local preview is not a deployment: the published origin was loaded in Chromium and the engine was observed stepping there.
 
 ## 7. Maintainer agreement
 

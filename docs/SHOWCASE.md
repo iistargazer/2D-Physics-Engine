@@ -39,7 +39,10 @@ dependency chain — but keep it.
 No CDN or runtime backend is required. The favicon is an inline SVG data URI, so the page
 issues no third-party requests. Use HTTP, not `file://`. The directory may contain local
 logs: copy only these nine files for delivery, never the SDK, dependencies or complete
-`build/` tree. GitHub hosting is not yet configured or published.
+`build/` tree. It is published at
+<https://site-22be3251e8494dca85d1edd16f3d6ae8.freebuff.page>; [DEPLOY](DEPLOY.md)
+records how that deployment was made, how to repeat it locally and which other hosts are
+still untested.
 
 ### First run and controls
 

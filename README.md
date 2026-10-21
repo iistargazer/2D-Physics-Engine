@@ -73,4 +73,6 @@ cmake --build build/demo --target demo
 
 Run the resulting demo executable from the repository root. Windows requires matching SFML/compiler runtime DLLs beside the executable. Native startup/keyboard controls and PNG capture have been exercised; mouse/appearance coverage is narrower than the browser checks.
 
-**Not yet shipped:** repository packaging, clean-clone/browser CI, executed sanitizers, representative active stress performance, and GitHub/Pages preparation. The [remaining checklist](PHYSICS_ENGINE_GUIDE.md#6-remaining-acceptance-and-github-preparation) is explicit. No permanent deployment is recorded.
+**Not yet shipped:** repository packaging, clean-clone/browser CI, executed sanitizers, and representative active stress performance. The [remaining checklist](PHYSICS_ENGINE_GUIDE.md#6-remaining-acceptance-and-github-preparation) is explicit.
+
+The lab is published: <https://site-22be3251e8494dca85d1edd16f3d6ae8.freebuff.page>. [DEPLOY](docs/DEPLOY.md) records what was verified there, how to rebuild the nine files, and the GitHub Pages / Netlify / object-storage routes that remain untested.

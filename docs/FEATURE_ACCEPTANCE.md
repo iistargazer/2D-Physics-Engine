@@ -27,7 +27,8 @@ Unchecked gates are requested work, **not implemented capability**.
   sustained active interaction/rendered FPS. Do not equate repeated runs of one binary
   with cross-platform bit-level determinism.
 - Commit/push to https://github.com/iistargazer/2D-Physics-Engine only after implementation,
-  meaningful verification and ownership review. No Pages publication was requested here.
+  meaningful verification and ownership review; `main` at `56d5997` is that commit. GitHub
+  Pages is still unpublished — the origin that is live is recorded in [DEPLOY](DEPLOY.md).
 
 ## Smallest coherent extension and dependency order
 

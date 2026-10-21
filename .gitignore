@@ -49,6 +49,9 @@
 !/build/web/instrument.js
 !/build/web/showcase.js
 
+# the staged deploy directory (nine built assets, copied by deploy/make-dist.sh)
+/deploy/dist/
+
 # generated HTML frame replays: reproduce with
 #   ./build/demo_broadphase build/<scene>_demo.html <scene>
 /build/*.html
